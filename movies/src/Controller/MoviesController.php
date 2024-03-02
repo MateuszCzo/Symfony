@@ -9,12 +9,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MoviesController extends AbstractController
 {
-    #[Route('/movies/{name}', name: 'app_movies', defaults: ['name' => null], methods: ['GET'])]
-    public function index($name): JsonResponse
+    #[Route('/movies', name: 'app_movies')]
+    public function index(): Response
     {
-        return $this->json([
-            'message' => $name,
-            'path' => 'src/Controller/MoviesController.php',
+        return $this->render('index.html.twig', [
+            'title' => 'movie title',
         ]);
     }
 }

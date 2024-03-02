@@ -1,0 +1,7 @@
+<div>
+    {% if title|default(null) %}
+        <p>{{ title }}</p>
+    {% else %}
+        <p>Woops something went wrong...</p>
+    {% endif %}
+</div>
