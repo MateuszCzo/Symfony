@@ -1,10 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends 'index.html.twig' %}
 
 {% block title %}
-    Movies Page
+    Movies Page2
 {% endblock %}
 
 {% block body %}
+
+    {# can not use variables from extended file #}
 
     {% if title|default(null) %}
         <p>{{ title }}</p>
