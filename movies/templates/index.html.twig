@@ -6,17 +6,6 @@
 
 {% block body %}
 
-    {% if title|default(null) %}
-        <p>{{ title }}</p>
-    {% else %}
-        <p>Woops something went wrong...</p>
-    {% endif %}
+    <h1>ASD</h1>
 
-    {% for movie in movies %}
-        <li>{{ movie }}</li>
-    {% endfor %}
-
-    {{ _self }}
-    {{ _charset }}
-    {{ author }}
 {% endblock %}
