@@ -12,16 +12,20 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Filesystem\Filesystem;
 
 class MoviesController extends AbstractController
 {
     private $em;
     private $movieRepository;
+    private $fileSystem;
 
     public function __construct(MovieRepository         $movieRepository,
-                                EntityManagerInterface  $em) {
+                                EntityManagerInterface  $em,
+                                Filesystem              $fileSystem) {
         $this->movieRepository =    $movieRepository;
         $this->em =                 $em;
+        $this->fileSystem =         $fileSystem;
     }
 
     #[Route('/movies', name: 'read_movies')]
@@ -115,6 +119,9 @@ class MoviesController extends AbstractController
     public function delete(Int $id): Response
     {
         $movie = $this->movieRepository->find($id);
+        if ($this->fileSystem->exists($this->getParameter('kernel.project_dir') . '/public/' . $movie->getImagePath())) {
+            $this->fileSystem->remove($this->getParameter('kernel.project_dir') . '/public/' . $movie->getImagePath());
+        }
         $this->em ->remove($movie);
         $this->em->flush();
         return $this->redirectToRoute('read_movies');
