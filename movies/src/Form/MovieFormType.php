@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MovieFormType extends AbstractType
 {
@@ -22,6 +24,7 @@ class MovieFormType extends AbstractType
                     'placeholder' => 'Enter title...',
                 ],
                 'label' => false,
+                'required' => false,
             ])
             ->add('releaseYear', IntegerType::class, [
                 'attr' => [
@@ -29,6 +32,7 @@ class MovieFormType extends AbstractType
                     'placeholder' => 'Enter release year...',
                 ],
                 'label' => false,
+                'required' => false,
             ])
             ->add('description', TextareaType::class, [
                 'attr' => [
@@ -36,10 +40,16 @@ class MovieFormType extends AbstractType
                     'placeholder' => 'Enter description...',
                 ],
                 'label' => false,
+                'required' => false,
             ])
             ->add('imagePath', FileType::class, [
                 'required' => false,
                 'mapped' => false,
+                'label' => false,
+                'constraints' => [
+                    new File(),
+                    new NotBlank(),
+                ]
                 ])
             /*
             ->add('actors', EntityType::class, [
