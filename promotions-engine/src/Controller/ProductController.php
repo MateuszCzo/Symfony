@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\LowestPriceEnquiry;
+use App\Filter\PromotionFilterInterface;
 use App\Service\Serializer\DTOSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,10 +15,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ProductController extends AbstractController
 {
     private SerializerInterface $serializer;
+    private PromotionFilterInterface $promotionFilter;
 
-    public function __construct(DTOSerializer $serializer)
+    public function __construct(DTOSerializer $serializer,
+                                PromotionFilterInterface $filter)
     {
         $this->serializer = $serializer;
+        $this->promotionFilter = $filter;
     }
 
     #[Route('/product/{productId}/lowest-price', name: 'lowest-price', methods: ['POST'])]
@@ -28,22 +32,13 @@ class ProductController extends AbstractController
                 'error' => 'Promotions Engine failure message',
             ], $request->headers->get('force_fail'));
         }
-
-        // 1. Deserialize json data into a EnquiryDTO
         /** @var LowestPriceEnquiry $lowestPriceEnquiry */
         $lowestPriceEnquiry = $this->serializer->deserialize(
             $request->getContent(), 
             LowestPriceEnquiry::class,
             'json');
-        // 2. Pass the Enquiry into a promotions filter
-            // the appropriate promotion will be applied
-
-        // 3. Return the modified Enquiry
-        $lowestPriceEnquiry->setDiscountedPrice(50);
-        $lowestPriceEnquiry->setPrice(100);
-        $lowestPriceEnquiry->setPromotionId(3);
-        $lowestPriceEnquiry->setPromotionName('Black Friday half price sale');
-        $responseContent = $this->serializer->serialize($lowestPriceEnquiry, 'json');
+        $modifiedEnquiry = $this->promotionFilter->apply($lowestPriceEnquiry);
+        $responseContent = $this->serializer->serialize($modifiedEnquiry, 'json');
         return new Response($responseContent, 200);
     }
 
