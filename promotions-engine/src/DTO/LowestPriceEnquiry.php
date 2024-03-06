@@ -17,7 +17,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return int|null $productId
      */
-    public function getProductId(): ?int {
+    public function getProductId(): ?int
+    {
         return $this->productId;
     }
 
@@ -25,7 +26,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param int|null $productId
      * @return self
      */
-    public function setProductId(?int $productId): self {
+    public function setProductId(?int $productId): self
+    {
         $this->productId = $productId;
         return $this;
     }
@@ -33,7 +35,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return int|null $quantity
      */
-    public function getQuantity(): ?int {
+    public function getQuantity(): ?int
+    {
         return $this->quantity;
     }
 
@@ -41,7 +44,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param int|null $quantity
      * @return self
      */
-    public function setQuantity(?int $quantity): self {
+    public function setQuantity(?int $quantity): self
+    {
         $this->quantity = $quantity;
         return $this;
     }
@@ -49,7 +53,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return string|null $requestLocation
      */
-    public function getRequestLocation(): ?string {
+    public function getRequestLocation(): ?string
+    {
         return $this->requestLocation;
     }
 
@@ -57,7 +62,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param string|null $requestLocation
      * @return self
      */
-    public function setRequestLocation(?string $requestLocation): self {
+    public function setRequestLocation(?string $requestLocation): self
+    {
         $this->requestLocation = $requestLocation;
         return $this;
     }
@@ -65,7 +71,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return string|null $voucherCode
      */
-    public function getVoucherCode(): ?string {
+    public function getVoucherCode(): ?string
+    {
         return $this->voucherCode;
     }
 
@@ -73,7 +80,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param string|null $voucherCode
      * @return self
      */
-    public function setVoucherCode(?string $voucherCode): self {
+    public function setVoucherCode(?string $voucherCode): self
+    {
         $this->voucherCode = $voucherCode;
         return $this;
     }
@@ -81,7 +89,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return string|null $requestDate
      */
-    public function getRequestDate(): ?string {
+    public function getRequestDate(): ?string
+    {
         return $this->requestDate;
     }
 
@@ -89,7 +98,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param string|null $requestDate
      * @return self
      */
-    public function setRequestDate(?string $requestDate): self {
+    public function setRequestDate(?string $requestDate): self
+    {
         $this->requestDate = $requestDate;
         return $this;
     }
@@ -97,7 +107,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return int|null $price
      */
-    public function getPrice(): ?int {
+    public function getPrice(): ?int
+    {
         return $this->price;
     }
 
@@ -105,7 +116,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param int|null $price
      * @return self
      */
-    public function setPrice(?int $price): self {
+    public function setPrice(?int $price): self
+    {
         $this->price = $price;
         return $this;
     }
@@ -113,7 +125,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return int|null $discountedPrice
      */
-    public function getDiscountedPrice(): ?int {
+    public function getDiscountedPrice(): ?int
+    {
         return $this->discountedPrice;
     }
 
@@ -121,7 +134,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param int|null $discountedPrice
      * @return self
      */
-    public function setDiscountedPrice(?int $discountedPrice): self {
+    public function setDiscountedPrice(?int $discountedPrice): self
+    {
         $this->discountedPrice = $discountedPrice;
         return $this;
     }
@@ -129,7 +143,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return int|null $promotionId
      */
-    public function getPromotionId(): ?int {
+    public function getPromotionId(): ?int
+    {
         return $this->promotionId;
     }
 
@@ -137,7 +152,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param int|null $promotionId
      * @return self
      */
-    public function setPromotionId(?int $promotionId): self {
+    public function setPromotionId(?int $promotionId): self
+    {
         $this->promotionId = $promotionId;
         return $this;
     }
@@ -145,7 +161,8 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
     /**
      * @return string|null $promotionName
      */
-    public function getPromotionName(): ?string {
+    public function getPromotionName(): ?string
+    {
         return $this->promotionName;
     }
 
@@ -153,8 +170,17 @@ class LowestPriceEnquiry implements PromotionEnquiryInterface
      * @param string|null $promotionName
      * @return self
      */
-    public function setPromotionName(?string $promotionName): self {
+    public function setPromotionName(?string $promotionName): self
+    {
         $this->promotionName = $promotionName;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
     }
 }

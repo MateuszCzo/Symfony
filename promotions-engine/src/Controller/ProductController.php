@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\LowestPriceEnquiry;
+use App\Service\Serializer\DTOSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,9 +13,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ProductController extends AbstractController
 {
-    private $serializer;
+    private SerializerInterface $serializer;
 
-    public function __construct(SerializerInterface $serializer) {
+    public function __construct(DTOSerializer $serializer)
+    {
         $this->serializer = $serializer;
     }
 
@@ -27,24 +29,22 @@ class ProductController extends AbstractController
             ], $request->headers->get('force_fail'));
         }
 
-        // 1 DTO
+        // 1. Deserialize json data into a EnquiryDTO
+        /** @var LowestPriceEnquiry $lowestPriceEnquiry */
         $lowestPriceEnquiry = $this->serializer->deserialize(
             $request->getContent(), 
             LowestPriceEnquiry::class,
             'json');
-        dd($lowestPriceEnquiry);
+        // 2. Pass the Enquiry into a promotions filter
+            // the appropriate promotion will be applied
 
-        return new JsonResponse([
-            'quantity' => 5,
-            'request_location' => 'UK',
-            'voucher_code' => 'OUI812',
-            'request_data' => '2022-04-04',
-            'product_id' => $productId,
-            'price' => 100,
-            'discounted_price' => 50,
-            'promotion_id' => 3,
-            'promotion_name' => 'Black Friday half price sale',
-        ], 200);
+        // 3. Return the modified Enquiry
+        $lowestPriceEnquiry->setDiscountedPrice(50);
+        $lowestPriceEnquiry->setPrice(100);
+        $lowestPriceEnquiry->setPromotionId(3);
+        $lowestPriceEnquiry->setPromotionName('Black Friday half price sale');
+        $responseContent = $this->serializer->serialize($lowestPriceEnquiry, 'json');
+        return new Response($responseContent, 200);
     }
 
     #[Route('/product/{id}/promotions', name: 'promotions', methods: ['GET'])]
