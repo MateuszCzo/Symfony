@@ -2,14 +2,22 @@
 
 namespace App\Controller;
 
+use App\DTO\LowestPriceEnquiry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ProductController extends AbstractController
 {
+    private $serializer;
+
+    public function __construct(SerializerInterface $serializer) {
+        $this->serializer = $serializer;
+    }
+
     #[Route('/product/{productId}/lowest-price', name: 'lowest-price', methods: ['POST'])]
     public function lowestPrice(Request $request, int $productId): Response
     {
@@ -18,6 +26,13 @@ class ProductController extends AbstractController
                 'error' => 'Promotions Engine failure message',
             ], $request->headers->get('force_fail'));
         }
+
+        // 1 DTO
+        $lowestPriceEnquiry = $this->serializer->deserialize(
+            $request->getContent(), 
+            LowestPriceEnquiry::class,
+            'json');
+        dd($lowestPriceEnquiry);
 
         return new JsonResponse([
             'quantity' => 5,
