@@ -18,6 +18,7 @@ class Product
     #[ORM\Column]
     private ?int $price = null;
 
+    /*
     #[ORM\OneToMany(targetEntity: ProductPromotion::class, mappedBy: 'product')]
     private Collection $productPromotions;
 
@@ -25,6 +26,7 @@ class Product
     {
         $this->productPromotions = new ArrayCollection();
     }
+    */
 
     public function getId(): ?int
     {
@@ -46,6 +48,7 @@ class Product
     /**
      * @return Collection<int, ProductPromotion>
      */
+    /*
     public function getProductPromotions(): Collection
     {
         return $this->productPromotions;
@@ -72,4 +75,5 @@ class Product
 
         return $this;
     }
+    */
 }

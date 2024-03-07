@@ -51,12 +51,9 @@ class ProductController extends AbstractController
             $product,
             date_create_immutable($lowestPriceEnquiry->getRequestDate())
         );
-
-        dd($promotions);
-
-        $modifiedEnquiry = $this->promotionFilter->apply($lowestPriceEnquiry, $promotions);
+        $modifiedEnquiry = $this->promotionFilter->apply($lowestPriceEnquiry, ...$promotions);
         $responseContent = $this->serializer->serialize($modifiedEnquiry, 'json');
-        return new Response($responseContent, 200);
+        return new Response($responseContent, 200, ['Content-Type' => 'application/json']);
     }
 
     #[Route('/product/{id}/promotions', name: 'promotions', methods: ['GET'])]
