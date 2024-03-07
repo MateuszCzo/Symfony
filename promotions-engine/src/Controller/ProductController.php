@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\DTO\LowestPriceEnquiry;
 use App\Filter\PromotionFilterInterface;
+use App\Repository\ProductRepository;
+use App\Repository\PromotionRepository;
 use App\Service\Serializer\DTOSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +18,18 @@ class ProductController extends AbstractController
 {
     private SerializerInterface $serializer;
     private PromotionFilterInterface $promotionFilter;
+    private ProductRepository $productRepository;
+    private PromotionRepository $promotionRepository;
 
     public function __construct(DTOSerializer $serializer,
-                                PromotionFilterInterface $filter)
+                                PromotionFilterInterface $filter,
+                                ProductRepository $productRepository,
+                                PromotionRepository $promotionRepository)
     {
         $this->serializer = $serializer;
         $this->promotionFilter = $filter;
+        $this->productRepository = $productRepository;
+        $this->promotionRepository = $promotionRepository;
     }
 
     #[Route('/product/{productId}/lowest-price', name: 'lowest-price', methods: ['POST'])]
@@ -37,7 +45,16 @@ class ProductController extends AbstractController
             $request->getContent(), 
             LowestPriceEnquiry::class,
             'json');
-        $modifiedEnquiry = $this->promotionFilter->apply($lowestPriceEnquiry);
+        $product = $this->productRepository->find($productId);
+        $lowestPriceEnquiry->setProduct($product);
+        $promotions = $this->promotionRepository->findValidForProduct(
+            $product,
+            date_create_immutable($lowestPriceEnquiry->getRequestDate())
+        );
+
+        dd($promotions);
+
+        $modifiedEnquiry = $this->promotionFilter->apply($lowestPriceEnquiry, $promotions);
         $responseContent = $this->serializer->serialize($modifiedEnquiry, 'json');
         return new Response($responseContent, 200);
     }
