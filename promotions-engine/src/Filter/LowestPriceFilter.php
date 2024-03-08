@@ -4,12 +4,28 @@ namespace App\Filter;
 
 use App\DTO\PromotionEnquiryInterface;
 use App\Entity\Promotion;
+use App\Filter\Modifier\Factory\PriceModifierFactoryInterface;
 
 class LowestPriceFilter implements PromotionFilterInterface
 {
-    public function apply(PromotionEnquiryInterface $enquiry, Promotion ...$promotion): PromotionEnquiryInterface
+    private $priceModifierFactory;
+
+    public function __construct(PriceModifierFactoryInterface $priceModifierFactory) {
+        $this->priceModifierFactory = $priceModifierFactory;
+    }
+
+    public function apply(PromotionEnquiryInterface $enquiry, Promotion ...$promotions): PromotionEnquiryInterface
     {
-        $enquiry->setDiscountedPrice(50);
+        $price = $enquiry->getProduct()->getPrice();
+        $quantity = $enquiry->getQuantity();
+        $lowestPrice = $quantity * $price;
+
+        foreach($promotions as $promotion) {
+            $priceModifier = $this->priceModifierFactory->create($promotion->getType());
+            //todo find lowest price
+        }
+
+        $enquiry->setDiscountedPrice(250);
         $enquiry->setPrice(100);
         $enquiry->setPromotionId(3);
         $enquiry->setPromotionName('Black Friday half price sale');
