@@ -11,17 +11,8 @@ class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
-        $response = new JsonResponse([
-            'type'          => 'ConstraintViolationList',
-            'title'         => 'An error occured',
-            'description'   => 'This value should be positive',
-            'violations'    => [
-                [
-                    'propertyPath'  => 'quantity',
-                    'message'       => 'This value should be positive',
-                ]
-            ]
-        ]);
+        $exceptionData = $exception->getExceptionData();
+        $response = new JsonResponse($exceptionData->toArray());
         if ($exception instanceof HttpExceptionInterface) {
             $response->setStatusCode($exception->getStatusCode());
         } else {
