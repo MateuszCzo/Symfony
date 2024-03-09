@@ -3,15 +3,14 @@
 namespace App\Command;
 
 use App\Entity\Stock;
-use App\Http\YahooFinanceApiClient;
+use App\Http\FinanceApiClientInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(
     name: 'app:refresh-stock-profile',
@@ -20,12 +19,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class RefreshStockProfileCommand extends Command
 {
     private $entityManager;
-    private $yahooFinanceApiClient;
+    private $financeApiClient;
+    private $serializer;
 
-    public function __construct(EntityManagerInterface $entityManager, YahooFinanceApiClient $yahooFinanceApiClient)
+    public function __construct(EntityManagerInterface $entityManager, 
+                                FinanceApiClientInterface $financeApiClient,
+                                SerializerInterface $serializer)
     {
         $this->entityManager = $entityManager;
-        $this->yahooFinanceApiClient = $yahooFinanceApiClient;
+        $this->financeApiClient = $financeApiClient;
+        $this->serializer = $serializer;
 
         parent::__construct();
     }
@@ -41,24 +44,14 @@ class RefreshStockProfileCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $stockProfile = $this->yahooFinanceApiClient->fetchStockProfile($input->getArgument('symbol'), $input->getArgument('region'));
+        $stockProfile = $this->financeApiClient->fetchStockProfile($input->getArgument('symbol'), $input->getArgument('region'));
 
         if ($stockProfile['statusCode'] !== 200) {
             
         }
 
         $stock = $this->serializer->deserialize($stockProfile['content'], Stock::class, 'json');
-        /*
-        $stock->setSymbol($stockProfile->symbol);
-        $stock->setShortName($stockProfile->shortName);
-        $stock->setCurrency($stockProfile->currency);
-        $stock->setExchangeName($stockProfile->exchangeName);
-        $stock->setRegion($stockProfile->region);
-        $stock->setPrice($stockProfile->price);
-        $stock->setPreviousClose($stockProfile->previousClose);
-        $priceChange = $stockProfile->price - $stockProfile->previousClose;
-        $stock->setPriceChange($priceChange);
-*/
+        
         $this->entityManager->persist($stock);
 
         $this->entityManager->flush();

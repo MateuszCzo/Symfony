@@ -12,10 +12,10 @@ class YahooFinanceApiClientTest extends DatabaseDependantTestCase
      */
     public function the_yahoo_finanfe_api_clinet_returns_the_correct_data()
     {
-        /** @var YahooFinanceApiClient $yahooFinanceApiClient */
-        $yahooFinanceApiClient = self::$kernel->getContainer()->get('yahoo-finance-api-client');
+        /** @var FinanceApiClientInterface $financeApiClient */
+        $financeApiClient = self::$kernel->getContainer()->get('yahoo-finance-api-client');
 
-        $response = $yahooFinanceApiClient->fetchStockProfile('AMZN', 'US');
+        $response = $financeApiClient->fetchStockProfile('AMZN', 'US');
 
         $stockProfile = json_decode($response['content']);
 

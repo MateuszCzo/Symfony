@@ -23,13 +23,13 @@ class Stock
     #[ORM\Column(length: 30)]
     private ?string $exchangeName = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(type: Types::FLOAT, precision: 10, scale: 2)]
     private ?string $price = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: Types::FLOAT, precision: 10, scale: 2, nullable: true)]
     private ?string $priceChange = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: Types::FLOAT, precision: 10, scale: 2, nullable: true)]
     private ?string $previousClose = null;
 
     #[ORM\Column(length: 3)]
@@ -79,36 +79,36 @@ class Stock
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(float $price): static
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getPriceChange(): ?string
+    public function getPriceChange(): ?float
     {
         return $this->priceChange;
     }
 
-    public function setPriceChange(?string $priceChange): static
+    public function setPriceChange(?float $priceChange): static
     {
         $this->priceChange = $priceChange;
 
         return $this;
     }
 
-    public function getPreviousClose(): ?string
+    public function getPreviousClose(): ?float
     {
         return $this->previousClose;
     }
 
-    public function setPreviousClose(?string $previousClose): static
+    public function setPreviousClose(?float $previousClose): static
     {
         $this->previousClose = $previousClose;
 
