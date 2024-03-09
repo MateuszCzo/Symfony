@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class YahooFinanceApiClient implements FinanceApiClientInterface
@@ -12,13 +13,14 @@ class YahooFinanceApiClient implements FinanceApiClientInterface
     private $httpClient;
     private $rapidApiKey;
 
-    public function __construct(HttpClientInterface $httpClient, $rapidApiKey) {
+    public function __construct(HttpClientInterface $httpClient, string $rapidApiKey) {
         $this->httpClient = $httpClient;
         $this->rapidApiKey = $rapidApiKey;
     }
 
-    public function fetchStockProfile(string $symbol, string $region): array
+    public function fetchStockProfile(string $symbol, string $region): JsonResponse
     {
+        /*
         $response = $this->httpClient->request('GET', self::URL . $symbol, [
             'query' => [
                 'symbol' => $symbol,
@@ -31,23 +33,36 @@ class YahooFinanceApiClient implements FinanceApiClientInterface
         ]);
 
         if ($response->getStatusCode() !== 200) {
-
+            return new JsonResponse('Finance API Client Error.', 400);
         }
 
         $stockProfile = json_decode($response->getContent());
 
-        return [
-            'statusCode'    => 200,
-            'content'       => json_encode([
-                'symbol'        => $stockProfile->symbol,
-                'shortName'     => $stockProfile->shortName,
-                'region'        => $region,
-                'exchangeName'  => $stockProfile->exchangeName,
-                'currency'      => $stockProfile->currency,
-                'price'         => $stockProfile->regularMarketPrice->raw,
-                'previousClose' => $stockProfile->regularMarketPreviousClose->raw,
-                'priceChange'   => $stockProfile->regularMarketPrice->raw - $stockProfile->regularMarketPreviousClose->raw,
-            ]),
+        $stockProfileAsArray = [
+            'symbol'        => $stockProfile->symbol,
+            'shortName'     => $stockProfile->shortName,
+            'region'        => $region,
+            'exchangeName'  => $stockProfile->exchangeName,
+            'currency'      => $stockProfile->currency,
+            'price'         => $stockProfile->regularMarketPrice->raw,
+            'previousClose' => $stockProfile->regularMarketPreviousClose->raw,
+            'priceChange'   => $stockProfile->regularMarketPrice->raw - $stockProfile->regularMarketPreviousClose->raw,
         ];
+
+        return new JsonResponse($stockProfileAsArray, 200);
+        */
+
+        $stockProfileAsArray = [
+            'symbol'    => 'AMZN',
+            'shortName'     => 'Amazon.com, Inc.',
+            'region'        => 'US',
+            'exchangeName'  => 'NasdaqGS',
+            'currency'      => 'USD',
+            'price'         => 100.50,
+            'previousClose' => 110.20,
+            'priceChange'   => -9.70,
+        ];
+
+        return new JsonResponse($stockProfileAsArray, 200);
     }
 }

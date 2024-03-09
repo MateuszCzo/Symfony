@@ -53,4 +53,35 @@ class RefreshStockProfileCommandTest extends DatabaseDependantTestCase
         $this->assertIsFloat($stock->getPreviousClose());
         $this->assertIsFloat($stock->getPriceChange());
     }
+
+    public function non_200_status_code_response_are_handled_correctly()
+    {
+        // Setup
+        $application = new Application(self::$kernel);
+
+        $command = $application->find('app:refresh-stock-profile');
+
+        $commandTester = new CommandTester($command);
+
+        // Non 200 response
+        FakeYahooFinanceApiClient::$statusCode = 500;
+        FakeYahooFinanceApiClient::$content = 'Finance API Client Error.';
+
+        $commandStatus = $commandTester->execute([
+            'symbol' => 'AMZN',
+            'region' => 'US'
+        ]);
+
+        // Do something
+        $repo = $this->entityManager->getRepository(Stock::class);
+
+        $stockRecordCount = $repo->createQueryBuilder('stock')
+            ->select('count(stock.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Make assertion
+        $this->assertEquals(1, $commandStatus);
+        $this->assertEquals(0, $stockRecordCount);
+    }
 }

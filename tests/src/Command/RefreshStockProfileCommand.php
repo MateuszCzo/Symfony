@@ -46,11 +46,11 @@ class RefreshStockProfileCommand extends Command
     {
         $stockProfile = $this->financeApiClient->fetchStockProfile($input->getArgument('symbol'), $input->getArgument('region'));
 
-        if ($stockProfile['statusCode'] !== 200) {
-            
+        if ($stockProfile->getStatusCode() !== 200) {
+            return Command::FAILURE;
         }
 
-        $stock = $this->serializer->deserialize($stockProfile['content'], Stock::class, 'json');
+        $stock = $this->serializer->deserialize($stockProfile->getContent(), Stock::class, 'json');
         
         $this->entityManager->persist($stock);
 
