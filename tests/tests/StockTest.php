@@ -18,6 +18,14 @@ class StockTest extends KernelTestCase
         $this->entityManager = $kernel->getContainer()->get('doctrine')->getManager();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->entityManager->close();
+        $this->entityManager = null;
+    }
+
     /** @test */
     public function a_stock_record_can_be_created_in_database()
     {   
