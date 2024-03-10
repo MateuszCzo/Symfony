@@ -12,6 +12,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Refresh Stock Profile Command 
+ * - fatch data using Yahoo Finance Api Client
+ * - save it to database
+ */
 #[AsCommand(
     name: 'app:refresh-stock-profile',
     description: 'Add a short description for your command',

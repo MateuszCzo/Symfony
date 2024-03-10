@@ -4,6 +4,9 @@ namespace App\Tests\integration;
 
 use App\Tests\DatabaseDependantTestCase;
 
+/**
+ * Yahoo Fiannce Api Client test
+ */
 class YahooFinanceApiClientTest extends DatabaseDependantTestCase
 {
     /**

@@ -4,6 +4,9 @@ namespace App\Http;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Fake Yahoo Finance Api - imitate a connection to the real api and returns data
+ */
 class FakeYahooFinanceApiClient implements FinanceApiClientInterface
 {
     public static $statusCode = 200;

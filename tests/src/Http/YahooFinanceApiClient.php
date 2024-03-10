@@ -5,6 +5,9 @@ namespace App\Http;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * Yahoo Finance Api - make a connection to api and fetch data
+ */
 class YahooFinanceApiClient implements FinanceApiClientInterface
 {
     private const URL = 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-profile';

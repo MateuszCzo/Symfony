@@ -2,11 +2,13 @@
 
 namespace App\Tests;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use LogicException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Migrate database to memory (sqlite)
+ */
 class DatabasePrimer
 {
     public static function prime(KernelInterface $kernel)

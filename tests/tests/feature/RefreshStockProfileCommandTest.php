@@ -8,6 +8,10 @@ use App\Tests\DatabaseDependantTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * Refresh Stock Profile Command test
+ * using Fake Yahoo Finance Api Client
+ */
 class RefreshStockProfileCommandTest extends DatabaseDependantTestCase
 {
     /** @test */

@@ -4,6 +4,9 @@ namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
+/**
+ * Used to set up tests
+ */
 class DatabaseDependantTestCase extends KernelTestCase
 {
     /** @var EntityMenagetInterface $entityManager */
