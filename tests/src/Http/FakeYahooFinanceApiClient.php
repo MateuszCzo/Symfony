@@ -16,4 +16,17 @@ class FakeYahooFinanceApiClient implements FinanceApiClientInterface
     {
         return new JsonResponse(self::$content, self::$statusCode, [], $json = true);
     }
+
+    public static function setContent(array $overrides): void {
+        self::$content = json_encode(array_merge([
+            'symbol'    => 'AMZN',
+            'short_name'     => 'Amazon.com, Inc.',
+            'region'        => 'US',
+            'exchange_name'  => 'NasdaqGS',
+            'currency'      => 'USD',
+            'price'         => 100.50,
+            'previous_close' => 110.20,
+            'price_change'   => -9.70,
+        ], $overrides));
+    }
 }

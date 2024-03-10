@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -52,14 +53,25 @@ class RefreshStockProfileCommand extends Command
         $stockProfile = $this->financeApiClient->fetchStockProfile($input->getArgument('symbol'), $input->getArgument('region'));
 
         if ($stockProfile->getStatusCode() !== 200) {
+            $output->writeln($stockProfile->getContent());
+
             return Command::FAILURE;
         }
 
-        $stock = $this->serializer->deserialize($stockProfile->getContent(), Stock::class, 'json');
+        $symbol = json_decode($stockProfile->getContent())->symbol ?? null;
+
+        if ($stock = $this->entityManager->getRepository(Stock::class)->findOneBy(['symbol' => $symbol])) {
+            $this->serializer->deserialize($stockProfile->getContent(), 
+            Stock::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $stock]);
+        } else {
+            $stock = $this->serializer->deserialize($stockProfile->getContent(), Stock::class, 'json');
+        }
         
         $this->entityManager->persist($stock);
 
         $this->entityManager->flush();
+
+        $output->writeln($stock->getShortName() . ' has been saved / updated.');
 
         return Command::SUCCESS;
     }

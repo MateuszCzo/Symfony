@@ -15,7 +15,7 @@ class StockTest extends DatabaseDependantTestCase
         // Set up
         $stock = new Stock();
         $stock->setSymbol('AMZN');
-        $stock->setShortName('Amazon Inc.');
+        $stock->setShortName('Amazon.com Inc.');
         $stock->setCurrency('USD');
         $stock->setExchangeName('NasdaqGS');
         $stock->setRegion('US');
@@ -34,7 +34,7 @@ class StockTest extends DatabaseDependantTestCase
         $stockRecord = $stockRepository->findOneBy(['symbol' => 'AMZN']);
 
         // Make assertions
-        $this->assertEquals('Amazon Inc.', $stockRecord->getShortName());
+        $this->assertEquals('Amazon.com Inc.', $stockRecord->getShortName());
         $this->assertEquals('USD', $stockRecord->getCurrency());
         $this->assertEquals('NasdaqGS', $stockRecord->getExchangeName());
         $this->assertEquals('US', $stockRecord->getRegion());

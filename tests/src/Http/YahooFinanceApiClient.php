@@ -61,9 +61,9 @@ class YahooFinanceApiClient implements FinanceApiClientInterface
             'region'        => 'US',
             'exchangeName'  => 'NasdaqGS',
             'currency'      => 'USD',
-            'price'         => 100.50,
-            'previousClose' => 110.20,
-            'priceChange'   => -9.70,
+            'price'         => 3100.00,
+            'previousClose' => 3000.00,
+            'priceChange'   => 100.00,
         ];
 
         return new JsonResponse($stockProfileAsArray, 200);

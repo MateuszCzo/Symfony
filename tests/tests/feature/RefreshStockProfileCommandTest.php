@@ -15,7 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 class RefreshStockProfileCommandTest extends DatabaseDependantTestCase
 {
     /** @test */
-    public function the_refresh_stock_profile_command_behaves_correctly_when_a_stock_record_does_not_exist()
+    public function the_refresh_stock_profile_command_creates_new_record_correctly()
     {
         // SETUP
         $application = new Application(self::$kernel);
@@ -56,8 +56,65 @@ class RefreshStockProfileCommandTest extends DatabaseDependantTestCase
         $this->assertIsFloat($stock->getPrice());
         $this->assertIsFloat($stock->getPreviousClose());
         $this->assertIsFloat($stock->getPriceChange());
+        $this->assertStringContainsString('Amazon.com, Inc. has been saved / updated.', $commandTester->getDisplay());
     }
 
+    /** @test */
+    public function the_refresh_stodk_profile_command_creates_new_record_correctly()
+    {
+        // Setup
+        // Set up
+        $stock = new Stock();
+        $stock->setSymbol('AMZN');
+        $stock->setShortName('Amazon.com Inc.');
+        $stock->setCurrency('USD');
+        $stock->setExchangeName('NasdaqGS');
+        $stock->setRegion('US');
+        $stock->setPrice(3100);
+        $stock->setPreviousClose(3000);
+        $stock->setPriceChange(100);
+
+        $this->entityManager->persist($stock);
+        $this->entityManager->flush();
+
+        $stockId = $stock->getId();
+
+        $application = new Application(self::$kernel);
+
+        $command = $application->find('app:refresh-stock-profile');
+
+        $commandTester = new CommandTester($command);
+
+        // Non 200 response
+        FakeYahooFinanceApiClient::$statusCode = 200;
+        FakeYahooFinanceApiClient::setContent([
+            'previous_close' => 3100,
+            'price' => 3200,
+            'price_change' => 100
+        ]);
+
+        $commandStatus = $commandTester->execute([
+            'symbol' => 'AMZN',
+            'region' => 'US'
+        ]);
+
+        $repo = $this->entityManager->getRepository(Stock::class);
+
+        $stockRecord = $repo->find($stockId);
+
+        $stockRecordCount = $repo->createQueryBuilder('stock')
+            ->select('count(stock.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $this->assertEquals(0, $commandStatus);
+        $this->assertEquals(3100, $stockRecord->getPreviousClose());
+        $this->assertEquals(3200, $stockRecord->getPrice());
+        $this->assertEquals(100, $stockRecord->getPriceChange());
+        $this->assertEquals(1, $stockRecordCount);
+    }
+
+    /** @test */
     public function non_200_status_code_response_are_handled_correctly()
     {
         // Setup
@@ -87,5 +144,6 @@ class RefreshStockProfileCommandTest extends DatabaseDependantTestCase
         // Make assertion
         $this->assertEquals(1, $commandStatus);
         $this->assertEquals(0, $stockRecordCount);
+        $this->assertStringContainsString('Finance API Client Error.', $commandTester->getDisplay());
     }
 }
