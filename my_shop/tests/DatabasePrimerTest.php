@@ -17,6 +17,14 @@ class DatabasePrimerTest extends KernelTestCase
         $this->entityManager = $kernel->getContainer()->get('doctrine')->getManager();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->entityManager->close();
+        $this->entityManager = null;
+    }
+
     /** @test */
     public function database_primer_loads_correctly(): void
     {
