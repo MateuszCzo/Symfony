@@ -5,26 +5,8 @@ namespace App\Tests;
 use App\Entity\Product;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ProductTest extends KernelTestCase
+class ProductTest extends KernelTestCaseWithDatabase
 {
-    /** @var EntityMenagetInterface $entityManager */
-    protected $entityManager;
-
-    protected function setUp(): void
-    {
-        $kernel = self::bootKernel();
-        DatabasePrimer::prime($kernel);
-        $this->entityManager = $kernel->getContainer()->get('doctrine')->getManager();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->entityManager->close();
-        $this->entityManager = null;
-    }
-
     /** @test */
     public function product_can_be_created_in_database()
     {
