@@ -45,6 +45,9 @@ class Product
     #[ORM\ManyToMany(targetEntity: Discount::class, mappedBy: 'products')]
     private Collection $discounts;
 
+    #[ORM\Column]
+    private ?bool $active = null;
+
     public function __construct()
     {
         $this->subcategories = new ArrayCollection();
@@ -206,6 +209,18 @@ class Product
         if ($this->discounts->removeElement($discount)) {
             $discount->removeProduct($this);
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }
