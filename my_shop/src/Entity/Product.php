@@ -48,11 +48,19 @@ class Product
     #[ORM\Column]
     private ?bool $active = null;
 
+    #[ORM\ManyToMany(targetEntity: Attatchment::class)]
+    private Collection $attatchments;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Manufacturer $manufacturer = null;
+
     public function __construct()
     {
         $this->subcategories = new ArrayCollection();
         $this->otherImages = new ArrayCollection();
         $this->discounts = new ArrayCollection();
+        $this->attatchments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -221,6 +229,42 @@ class Product
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Attatchment>
+     */
+    public function getAttatchments(): Collection
+    {
+        return $this->attatchments;
+    }
+
+    public function addAttatchment(Attatchment $attatchment): static
+    {
+        if (!$this->attatchments->contains($attatchment)) {
+            $this->attatchments->add($attatchment);
+        }
+
+        return $this;
+    }
+
+    public function removeAttatchment(Attatchment $attatchment): static
+    {
+        $this->attatchments->removeElement($attatchment);
+
+        return $this;
+    }
+
+    public function getManufacturer(): ?Manufacturer
+    {
+        return $this->manufacturer;
+    }
+
+    public function setManufacturer(?Manufacturer $manufacturer): static
+    {
+        $this->manufacturer = $manufacturer;
 
         return $this;
     }

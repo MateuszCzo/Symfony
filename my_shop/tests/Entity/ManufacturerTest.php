@@ -4,28 +4,35 @@ namespace App\Tests\Entity;
 
 use App\Entity\Image;
 use App\Entity\Manufacturer;
+use App\Entity\Product;
 use App\Tests\KernelTestCaseWithDatabase;
+use App\Tests\ProductTest;
+use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
 class ManufacturerTest extends KernelTestCaseWithDatabase
 {
     /** @test */
     public function manufacturer_can_not_be_created_without_image(): void
     {
-        //todo
+        // Given
+        $manufacturer = self::getTestObject();
+
+        // Expect
+        self::expectException(NotNullConstraintViolationException::class);
+
+        // When
+        $this->entityManager->persist($manufacturer);
+        $this->entityManager->flush();
     }
 
     /** @test */
     public function manufacturer_can_be_created_in_database(): void
     {
         // Given
-        $image = new Image();
-        $image->setName('image_name');
-        $image->setType('image_type');
+        $image = ImageTest::getTestObject();
 
-        $manufacturer = new Manufacturer();
-        $manufacturer->setImage($image);
-        $manufacturer->setName('manufacturer_name');
-        $manufacturer->setDescription('manufacturer_description');
+        $manufacturer = self::getTestObject()
+            ->setImage($image);
 
         /** @var ManufacturerRepository $manufacturerRepository */
         $manufacturerRepository = $this->entityManager->getRepository(Manufacturer::class);
@@ -33,29 +40,60 @@ class ManufacturerTest extends KernelTestCaseWithDatabase
         // When
         $this->entityManager->persist($manufacturer);
         $this->entityManager->flush();
-        
-        $imageId = $manufacturer->getImage()->getId();
 
         /** @var Manufacturer $manufacturerRecord */
-        $manufacturerRecord = $manufacturerRepository->findOneBy(['name' => 'manufacturer_name']);
+        $manufacturerRecord = $manufacturerRepository->find($manufacturer->getId());
 
         // Then
-        $this->assertNotEquals(null, $manufacturerRecord);
-        $this->assertGreaterThan(0, $manufacturerRecord->getId());
-        $this->assertEquals('manufacturer_name', $manufacturerRecord->getName());
-        $this->assertEquals('manufacturer_description', $manufacturerRecord->getDescription());
-
-        $imageRecord = $manufacturerRecord->getImage();
-
-        $this->assertGreaterThan(0, $imageId);
-        $this->assertEquals($imageId, $imageRecord->getId());
-        $this->assertEquals('image_name', $imageRecord->getName());
-        $this->assertEquals('image_type', $imageRecord->getType());
+        self::asserttestObject($manufacturerRecord);
+        ImageTest::assertTestObject($manufacturerRecord->getImage());
     }
 
     /** @test */
     public function product_is_not_deleted_when_manufacturer_is_deleted(): void
     {
-        //todo
+        // Given
+        $manufacturer = self::getTestObject()
+            ->setImage(ImageTest::getTestObject());
+
+        $category = CategoryTest::getTestObject()
+            ->setImage(ImageTest::getTestObject());
+
+        $product = ProductTest::getTestObject()
+            ->setImage(ImageTest::getTestObject())
+            ->setCategory($category)
+            ->setManufacturer($manufacturer);
+
+        $this->entityManager->persist($category);
+        $this->entityManager->persist($manufacturer);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        /** @var ProductRepository $productRepository */
+        $productRepository = $this->entityManager->getRepository(Product::class);
+        
+        // When
+        $this->entityManager->remove($manufacturer);
+        $this->entityManager->flush();
+        
+        // Then
+        $productRecord = $productRepository->find($product->getId());
+
+        self::assertNotEquals(null, $productRecord);
+    }
+
+    public static function getTestObject(): Manufacturer
+    {
+        return (new Manufacturer())
+            ->setName('manufacturer_name')
+            ->setDescription('manufacturer_description');
+    }
+
+    public static function asserttestObject(Manufacturer $manufacturer): void
+    {
+        self::assertNotEquals(null, $manufacturer);
+        self::assertGreaterThan(0, $manufacturer->getId());
+        self::assertEquals('manufacturer_name', $manufacturer->getName());
+        self::assertEquals('manufacturer_description', $manufacturer->getDescription());
     }
 }

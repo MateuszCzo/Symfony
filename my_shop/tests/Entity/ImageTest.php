@@ -3,7 +3,10 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Image;
+use App\Entity\Manufacturer;
 use App\Tests\KernelTestCaseWithDatabase;
+use App\Tests\ProductTest;
+use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
 class ImageTest extends KernelTestCaseWithDatabase
 {
@@ -11,9 +14,7 @@ class ImageTest extends KernelTestCaseWithDatabase
     public function image_can_be_created_in_database(): void
     {
         // Given
-        $image = new Image();
-        $image->setName('image_name');
-        $image->setType('image_type');
+        $image = self::getTestObject();
 
         /** @var ImageRepository $imageRepository */
         $imageRepository = $this->entityManager->getRepository(Image::class);
@@ -23,30 +24,130 @@ class ImageTest extends KernelTestCaseWithDatabase
         $this->entityManager->flush();
 
         /** @var Image $imageRecord */
-        $imageRecord = $imageRepository->findOneBy(['name' => 'image_name']);
+        $imageRecord = $imageRepository->find($image->getId());
 
         // Then
-        $this->assertNotEquals(null, $imageRecord);
-        $this->assertGreaterThan(0, $imageRecord->getId());
-        $this->assertEquals('image_name', $imageRecord->getName());
-        $this->assertEquals('image_type', $imageRecord->getType());
+        self::assertTestObject($imageRecord);
     }
 
-    /** @test */
-    public function image_for_category_can_not_be_deleted(): void
-    {
-        //todo
-    }
+    // /** @test */
+    // public function image_can_not_be_deleted_while_in_category(): void
+    // {
+    //     // Given
+    //     $image = self::getTestObject();
+    //     $category = CategoryTest::getTestObject()
+    //         ->setImage($image);
+
+    //     $this->entityManager->persist($category);
+    //     $this->entityManager->flush();
+
+    //     // Expect
+    //     self::expectException(NotNullConstraintViolationException::class);
+
+    //     // When
+    //     $this->entityManager->remove($image);
+    //     $this->entityManager->flush();
+    // }
+
+    // /** @test */
+    // public function image_can_not_be_deleted_while_in_product(): void
+    // {
+    //     // Given
+    //     $category = CategoryTest::getTestObject()
+    //         ->setImage(ImageTest::getTestObject());
+
+    //     $manufacturer = ManufacturerTest::getTestObject()
+    //         ->setImage(ImageTest::getTestObject());
+
+    //     $imageProduct = ImageTest::getTestObject();
+
+    //     $product = ProductTest::getTestObject()
+    //         ->setImage($imageProduct)
+    //         ->setCategory($category);
+
+    //     $this->entityManager->persist($category);
+    //     $this->entityManager->persist($manufacturer);
+    //     $this->entityManager->persist($product);
+    //     $this->entityManager->flush();
+
+    //     // Expect
+    //     self::expectException(NotNullConstraintViolationException::class);
+
+    //     // When
+    //     $this->entityManager->remove($imageProduct);
+    //     $this->entityManager->flush();
+    // }
+
+    // /** @test */
+    // public function image_can_not_be_deleted_while_in_manufacturer(): void
+    // {
+    //     // Given
+    //     $image = self::getTestObject();
+    //     $category = ManufacturerTest::getTestObject()
+    //         ->setImage($image);
+
+    //     $this->entityManager->persist($category);
+    //     $this->entityManager->flush();
+
+    //     // Expect
+    //     self::expectException(NotNullConstraintViolationException::class);
+
+    //     // When
+    //     $this->entityManager->remove($image);
+    //     $this->entityManager->flush();
+    // }
 
     /** @test */
-    public function image_for_product_can_not_be_deleted(): void
+    public function other_images_for_product_can_be_deleted()
     {
-        //todo
+        // Given
+        $otherImage = self::getTestObject();
+
+        $category = CategoryTest::getTestObject()
+            ->setImage(ImageTest::getTestObject());
+
+        $manufacturer = ManufacturerTest::getTestObject()
+            ->setImage(ImageTest::getTestObject());
+
+        $product = ProductTest::getTestObject()
+            ->setImage(ImageTest::getTestObject())
+            ->setCategory($category)
+            ->setManufacturer($manufacturer)
+            ->addOtherImage($otherImage);
+
+        $this->entityManager->persist($category);
+        $this->entityManager->persist($manufacturer);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        /** @var ImageRepository $imageRepository */
+        $imageRepository = $this->entityManager->getRepository(Image::class);
+
+        $otherImageId = $otherImage->getId();
+
+        // When
+        $this->entityManager->remove($otherImage);
+        $this->entityManager->flush();
+
+        /** @var Image $imageRecord */
+        $imageRecord = $imageRepository->find($otherImageId);
+
+        // Then
+        self::assertEquals(null, $imageRecord);
+    }
+    
+    public static function getTestObject(): Image
+    {
+        return (new Image())
+            ->setName('image_name')
+            ->setType('image_type');
     }
 
-    /** @test */
-    public function image_for_manufacturer_can_not_be_deleted(): void
+    public static function assertTestObject($image): void
     {
-        //todo
+        self::assertNotEquals(null, $image);
+        self::assertGreaterThan(0, $image->getId());
+        self::assertEquals('image_name', $image->getName());
+        self::assertEquals('image_type', $image->getType());
     }
 }

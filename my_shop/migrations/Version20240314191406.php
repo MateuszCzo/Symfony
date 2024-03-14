@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240313214918 extends AbstractMigration
+final class Version20240314191406 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -36,8 +36,9 @@ final class Version20240313214918 extends AbstractMigration
         $this->addSql('CREATE TABLE order_product (order_id INT NOT NULL, product_id INT NOT NULL, INDEX IDX_2530ADE68D9F6D38 (order_id), INDEX IDX_2530ADE64584665A (product_id), PRIMARY KEY(order_id, product_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE order_discount (order_id INT NOT NULL, discount_id INT NOT NULL, INDEX IDX_1856BF8D9F6D38 (order_id), INDEX IDX_1856BF4C7C611F (discount_id), PRIMARY KEY(order_id, discount_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE payment (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, active TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE product (id INT AUTO_INCREMENT NOT NULL, category_id INT NOT NULL, image_id INT NOT NULL, quantity INT NOT NULL, price NUMERIC(10, 2) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, active TINYINT(1) NOT NULL, INDEX IDX_D34A04AD12469DE2 (category_id), UNIQUE INDEX UNIQ_D34A04AD3DA5256D (image_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE product (id INT AUTO_INCREMENT NOT NULL, category_id INT NOT NULL, image_id INT NOT NULL, manufacturer_id INT NOT NULL, quantity INT NOT NULL, price NUMERIC(10, 2) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, active TINYINT(1) NOT NULL, INDEX IDX_D34A04AD12469DE2 (category_id), UNIQUE INDEX UNIQ_D34A04AD3DA5256D (image_id), INDEX IDX_D34A04ADA23B42D (manufacturer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product_category (product_id INT NOT NULL, category_id INT NOT NULL, INDEX IDX_CDFC73564584665A (product_id), INDEX IDX_CDFC735612469DE2 (category_id), PRIMARY KEY(product_id, category_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE product_attatchment (product_id INT NOT NULL, attatchment_id INT NOT NULL, INDEX IDX_C1D114C4584665A (product_id), INDEX IDX_C1D114C7C77807D (attatchment_id), PRIMARY KEY(product_id, attatchment_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE `user` (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', available_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', delivered_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE address ADD CONSTRAINT FK_D4E6F81A76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
@@ -62,8 +63,11 @@ final class Version20240313214918 extends AbstractMigration
         $this->addSql('ALTER TABLE order_discount ADD CONSTRAINT FK_1856BF4C7C611F FOREIGN KEY (discount_id) REFERENCES discount (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD12469DE2 FOREIGN KEY (category_id) REFERENCES category (id)');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD3DA5256D FOREIGN KEY (image_id) REFERENCES image (id)');
+        $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04ADA23B42D FOREIGN KEY (manufacturer_id) REFERENCES manufacturer (id)');
         $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC73564584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC735612469DE2 FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE product_attatchment ADD CONSTRAINT FK_C1D114C4584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE product_attatchment ADD CONSTRAINT FK_C1D114C7C77807D FOREIGN KEY (attatchment_id) REFERENCES attatchment (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void
@@ -91,8 +95,11 @@ final class Version20240313214918 extends AbstractMigration
         $this->addSql('ALTER TABLE order_discount DROP FOREIGN KEY FK_1856BF4C7C611F');
         $this->addSql('ALTER TABLE product DROP FOREIGN KEY FK_D34A04AD12469DE2');
         $this->addSql('ALTER TABLE product DROP FOREIGN KEY FK_D34A04AD3DA5256D');
+        $this->addSql('ALTER TABLE product DROP FOREIGN KEY FK_D34A04ADA23B42D');
         $this->addSql('ALTER TABLE product_category DROP FOREIGN KEY FK_CDFC73564584665A');
         $this->addSql('ALTER TABLE product_category DROP FOREIGN KEY FK_CDFC735612469DE2');
+        $this->addSql('ALTER TABLE product_attatchment DROP FOREIGN KEY FK_C1D114C4584665A');
+        $this->addSql('ALTER TABLE product_attatchment DROP FOREIGN KEY FK_C1D114C7C77807D');
         $this->addSql('DROP TABLE address');
         $this->addSql('DROP TABLE attatchment');
         $this->addSql('DROP TABLE cart');
@@ -111,6 +118,7 @@ final class Version20240313214918 extends AbstractMigration
         $this->addSql('DROP TABLE payment');
         $this->addSql('DROP TABLE product');
         $this->addSql('DROP TABLE product_category');
+        $this->addSql('DROP TABLE product_attatchment');
         $this->addSql('DROP TABLE `user`');
         $this->addSql('DROP TABLE messenger_messages');
     }
