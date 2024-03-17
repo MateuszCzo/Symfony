@@ -2,12 +2,12 @@
 
 namespace App\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class KernelTestCaseWithDatabase extends KernelTestCase
 {
-    /** @var EntityMenagetInterface $entityManager */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -21,6 +21,5 @@ class KernelTestCaseWithDatabase extends KernelTestCase
         parent::tearDown();
 
         $this->entityManager->close();
-        $this->entityManager = null;
     }
 }

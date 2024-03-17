@@ -1,5 +1,6 @@
 framework:
     messenger:
+
         failure_transport: failed
 
         transports:
@@ -14,6 +15,11 @@ framework:
                     multiplier: 2
             failed: 'doctrine://default?queue_name=failed'
             # sync: 'sync://'
+
+        routing:
+            "%env(bool:MESSENGER_ENABLED)%" ?: Symfony\Component\Mailer\Messenger\SendEmailMessage: async 
+            Symfony\Component\Notifier\Message\ChatMessage: async
+            Symfony\Component\Notifier\Message\SmsMessage: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async

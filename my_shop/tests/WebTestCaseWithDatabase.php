@@ -2,24 +2,23 @@
 
 namespace App\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class WebTestCaseWithDatabase extends WebTestCase
 {
-    /** @var EntityMenagetInterface $entityManager */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    /** @var KernelBrowser $client */
-    protected $client;
+    protected KernelBrowser $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->client = static::createClient();
-        $kernel = self::bootKernel();
-        DatabasePrimer::prime($kernel);
-        $this->entityManager = $kernel->getContainer()->get('doctrine')->getManager();
+        $this->client = self::createClient();
+        DatabasePrimer::prime(self::$kernel);
+        $this->entityManager = self::$kernel->getContainer()->get('doctrine')->getManager();
     }
 
     protected function tearDown(): void
@@ -27,6 +26,5 @@ class WebTestCaseWithDatabase extends WebTestCase
         parent::tearDown();
 
         $this->entityManager->close();
-        $this->entityManager = null;
     }
 }
