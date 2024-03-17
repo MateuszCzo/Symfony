@@ -292,6 +292,7 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
 
         $crawler = $this->client->submit($form);
 
+        /** @var RawMessage $email */
         $email = self::getMailerMessage();
 
         $crawler = new Crawler($email->getHtmlBody());
