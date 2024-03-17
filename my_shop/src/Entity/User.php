@@ -139,8 +139,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAddress(Address $address): static
     {
         // set the owning side of the relation if necessary
-        if ($address->getUserId() !== $this) {
-            $address->setUserId($this);
+        if ($address->getUser() !== $this) {
+            $address->setUser($this);
         }
 
         $this->address = $address;
@@ -156,8 +156,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setContact(Contact $contact): static
     {
         // set the owning side of the relation if necessary
-        if ($contact->getUserId() !== $this) {
-            $contact->setUserId($this);
+        if ($contact->getUser() !== $this) {
+            $contact->setUser($this);
         }
 
         $this->contact = $contact;

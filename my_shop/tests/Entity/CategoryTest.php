@@ -4,19 +4,21 @@ namespace App\Tests\Entity;
 
 use App\Entity\Category;
 use App\Entity\Image;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
-use App\Tests\ProductTest;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
 class CategoryTest extends KernelTestCaseWithDatabase
 {
+    /** @test */
     public function category_can_not_be_created_without_image(): void
     {
         // Given
-        $category = self::getTestObject();
+        $category = DataProvider::getCategory();
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
+        self::expectExceptionMessage('constraint failed: category.image_id');
 
         // When
         $this->entityManager->persist($category);
@@ -27,8 +29,10 @@ class CategoryTest extends KernelTestCaseWithDatabase
     public function category_can_be_created_in_database(): void
     {
         // Given
-        $category = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $image = DataProvider::getConfiguredImage($this->entityManager);
+
+        $category = DataProvider::getCategory()
+            ->setImage($image);
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = $this->entityManager->getRepository(Category::class);
@@ -41,25 +45,21 @@ class CategoryTest extends KernelTestCaseWithDatabase
         $categoryRecord = $categoryRepository->find($category->getId());
 
         // Then
-        self::assertTestObject($categoryRecord);
-        ImageTest::assertTestObject($categoryRecord->getImage());
+        self::assertTestObject($category, $categoryRecord);
     }
 
     /** @test */
     public function child_category_can_access_parent_category(): void
     {
         // Given
-        $categoryParent = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $categoryParent = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $categoryChild = self::getTestObject()
-            ->setParent($categoryParent)
-            ->setImage(ImageTest::getTestObject());
+        $categoryChild = DataProvider::getConfiguredCategory($this->entityManager)
+            ->setParent($categoryParent);
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = $this->entityManager->getRepository(Category::class);
 
-        $this->entityManager->persist($categoryParent);
         $this->entityManager->persist($categoryChild);
         $this->entityManager->flush();
 
@@ -77,17 +77,14 @@ class CategoryTest extends KernelTestCaseWithDatabase
     public function parent_category_can_access_children_categories(): void
     {
         // Given
-        $categoryChild = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $categoryChild = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $categoryParent = self::getTestObject()
-            ->addChild($categoryChild)
-            ->setImage(ImageTest::getTestObject());
+        $categoryParent = DataProvider::getConfiguredCategory($this->entityManager)
+            ->addChild($categoryChild);
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = $this->entityManager->getRepository(Category::class);
 
-        $this->entityManager->persist($categoryChild);
         $this->entityManager->persist($categoryParent);
         $this->entityManager->flush();
 
@@ -109,15 +106,12 @@ class CategoryTest extends KernelTestCaseWithDatabase
     public function image_is_deleted_when_category_is_deleted(): void
     {
         // Given
-        $image = ImageTest::getTestObject();
-        $category = self::getTestObject()
-            ->setImage($image);
+        $category = DataProvider::getConfiguredCategory($this->entityManager);
+        
+        $image = $category->getImage();
 
         /** @var ImageRepository $imageRepository */
         $imageRepository = $this->entityManager->getRepository(Image::class);
-
-        $this->entityManager->persist($category);
-        $this->entityManager->flush();
 
         $imageId = $image->getId();
         
@@ -132,56 +126,15 @@ class CategoryTest extends KernelTestCaseWithDatabase
         self::assertEquals(null, $imageRecord);
     }
 
-    // /** @test */
-    // public function category_can_not_be_deleted_while_in_product(): void
-    // {
-    //     // Given
-    //     $category = self::getTestObject()
-    //         ->setImage(ImageTest::getTestObject());
-
-    //     $manufacturer = ManufacturerTest::getTestObject()
-    //         ->setImage(ImageTest::getTestObject());
-
-    //     $product = ProductTest::getTestObject()
-    //         ->setImage(ImageTest::getTestObject())
-    //         ->setCategory($category)
-    //         ->setManufacturer($manufacturer);
-
-    //     $this->entityManager->persist($category);
-    //     $this->entityManager->persist($manufacturer);
-    //     $this->entityManager->persist($product);
-    //     $this->entityManager->flush();
-
-    //     // Expect
-    //    self::expectException(NotNullConstraintViolationException::class);
-
-    //     // When
-    //     $this->entityManager->remove($category);
-    //     $this->entityManager->flush();
-    // }
-
     /** @test */
     public function subcategory_can_be_deleted_while_in_product(): void
     {
         // Given
-        $category = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $subcategory = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $subcategory = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
+            ->addSubcategory($subcategory);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setCategory($category)
-            ->setImage(ImageTest::getTestObject())
-            ->addSubcategory($subcategory)
-            ->setManufacturer($manufacturer);
-
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($subcategory);
-        $this->entityManager->persist($manufacturer);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
@@ -201,18 +154,14 @@ class CategoryTest extends KernelTestCaseWithDatabase
         self::assertEquals(null, $subcategoryRecord);
     }
 
-    public static function getTestObject(): Category
+    public static function assertTestObject(Category $categoryReference, Category $categoryToTest): void
     {
-        return (new Category())
-            ->setName('category_name')
-            ->setDescription('category_description');
-    }
-
-    public static function assertTestObject(Category $category): void
-    {
-        self::assertNotEquals(null, $category);
-        self::assertGreaterThan(0, $category->getId());
-        self::assertEquals('category_name', $category->getName());
-        self::assertEquals('category_description', $category->getDescription());
+        self::assertNotEquals(null, $categoryToTest);
+        self::assertEquals($categoryReference->getId(), $categoryToTest->getId());
+        self::assertEquals($categoryReference->getName(), $categoryToTest->getName());
+        self::assertEquals($categoryReference->getDescription(), $categoryToTest->getDescription());
+        self::assertEquals($categoryReference->getImage(), $categoryToTest->getImage());
+        self::assertEquals($categoryReference->getChildren(), $categoryToTest->getChildren());
+        self::assertEquals($categoryReference->getParent(), $categoryToTest->getParent());
     }
 }

@@ -4,7 +4,7 @@ namespace App\Tests\Entity;
 
 use App\Entity\Contact;
 use App\Entity\User;
-use App\Test\Entity\UserTest;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
@@ -14,10 +14,11 @@ class ContactTest extends KernelTestCaseWithDatabase
     public function contact_can_not_be_created_without_user(): void
     {
         // Given
-        $contact = self::getTestObject();
+        $contact = DataProvider::getContact();
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
+        self::expectExceptionMessage('constraint failed: contact.user_id');
 
         // When
         $this->entityManager->persist($contact);
@@ -28,16 +29,15 @@ class ContactTest extends KernelTestCaseWithDatabase
     public function contact_can_be_created_in_database(): void
     {
         // Given
-        $user = UserTest::getTestObject();
+        $user = DataProvider::getConfiguredUser($this->entityManager);
 
-        $contact = self::getTestObject()
-            ->setUserId($user);
+        $contact = DataProvider::getContact()
+            ->setUser($user);
 
         /** @var ContactRepository $contactRepository */
         $contactRepository = $this->entityManager->getRepository(Contact::class);
 
         // When
-        $this->entityManager->persist($user);
         $this->entityManager->persist($contact);
         $this->entityManager->flush();
 
@@ -45,24 +45,19 @@ class ContactTest extends KernelTestCaseWithDatabase
         $contactRecord = $contactRepository->find($contact->getId());
 
         // Then
-        self::assertTestObject($contactRecord);
+        self::assertTestObject($contact, $contactRecord);
     }
 
     /** @test */
     public function user_is_not_deleted_when_contact_is_deleted(): void
     {
         // Given
-        $user = UserTest::getTestObject();
-
-        $contact = self::getTestObject()
-            ->setUserId($user);
+        $contact = DataProvider::getConfiguredContact($this->entityManager);
+            
+        $user = $contact->getUser();
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($contact);
-        $this->entityManager->flush();
 
         // When
         $this->entityManager->remove($contact);
@@ -75,16 +70,11 @@ class ContactTest extends KernelTestCaseWithDatabase
         self::assertNotEquals(null, $userRecord);
     }
 
-    public static function getTestObject(): Contact
+    public static function assertTestObject(Contact $contactReference, Contact $contactToTest): void
     {
-        return (new Contact())
-            ->setPhoneNumber(123456789);
-    }
-
-    public static function assertTestObject(Contact $contact): void
-    {
-        self::assertNotEquals(null, $contact);
-        self::assertGreaterThan(0, $contact->getId());
-        self::assertEquals(123456789, $contact->getPhoneNumber());
+        self::assertNotEquals(null, $contactToTest);
+        self::assertEquals($contactReference->getId(), $contactToTest->getId());
+        self::assertEquals($contactReference->getUser(), $contactToTest->getUser());
+        self::assertEquals($contactReference->getPhoneNumber(), $contactToTest->getPhoneNumber());
     }
 }

@@ -4,8 +4,8 @@ namespace App\Tests\Entity;
 
 use App\Entity\Discount;
 use App\Entity\Product;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
-use App\Tests\ProductTest;
 
 class DiscountTest extends KernelTestCaseWithDatabase
 {
@@ -13,7 +13,7 @@ class DiscountTest extends KernelTestCaseWithDatabase
     public function discount_can_be_created_in_database(): void
     {
         // Given
-        $discount = self::getTestObject();
+        $discount = DataProvider::getDiscount();
 
         /** @var DiscountRepository $discountRepository */
         $discountRepository = $this->entityManager->getRepository(Discount::class);
@@ -26,33 +26,21 @@ class DiscountTest extends KernelTestCaseWithDatabase
         $discountRecord = $discountRepository->find($discount->getId());
 
         // Then
-        self::assertTestObject($discountRecord);
+        self::assertTestObject($discount, $discountRecord);
     }
 
     /** @test */
     public function discount_can_access_products(): void
     {
         // Given
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category);
-
-        $discount = self::getTestObject()
+        $discount = DataProvider::getDiscount()
             ->addProduct($product);
 
         /** @var DiscountRepository $discountRepository */
         $discountRepository = $this->entityManager->getRepository(Discount::class);
 
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($product);
         $this->entityManager->persist($discount);
         $this->entityManager->flush();
 
@@ -75,26 +63,14 @@ class DiscountTest extends KernelTestCaseWithDatabase
     public function product_is_not_deleted_when_discount_is_delted(): void
     {
         // Given
-        $discount = self::getTestObject();
+        $discount = DataProvider::getConfiguredDiscount($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addDiscount($discount);
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
 
-        $this->entityManager->persist($discount);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
         
@@ -112,22 +88,14 @@ class DiscountTest extends KernelTestCaseWithDatabase
 
     }
 
-    public static function getTestObject(): Discount
+    public static function assertTestObject(Discount $discountReference, Discount $discountToTest): void
     {
-        return (new Discount())
-            ->setName('discount_name')
-            ->setCriteria(['criteria_name' => 'criteria_value'])
-            ->setValue(0.5)
-            ->setType('discount_type');
-    }
-
-    public static function assertTestObject(Discount $discount): void
-    {
-        self::assertNotEquals(null, $discount);
-        self::assertGreaterThan(0, $discount->getId());
-        self::assertEquals('discount_name', $discount->getName());
-        self::assertEquals(['criteria_name' => 'criteria_value'], $discount->getCriteria());
-        self::assertEquals(0.5, $discount->getValue());
-        self::assertEquals('discount_type', $discount->getType());
+        self::assertNotEquals(null, $discountToTest);
+        self::assertEquals($discountReference->getId(), $discountToTest->getId());
+        self::assertEquals($discountReference->getName(), $discountToTest->getName());
+        self::assertEquals($discountReference->getCriteria(), $discountToTest->getCriteria());
+        self::assertEquals($discountReference->getValue(), $discountToTest->getValue());
+        self::assertEquals($discountReference->getType(), $discountToTest->getType());
+        self::assertEquals($discountReference->getProducts(), $discountToTest->getProducts());
     }
 }

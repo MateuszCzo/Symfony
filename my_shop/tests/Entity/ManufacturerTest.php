@@ -2,11 +2,10 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\Image;
 use App\Entity\Manufacturer;
 use App\Entity\Product;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
-use App\Tests\ProductTest;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
 class ManufacturerTest extends KernelTestCaseWithDatabase
@@ -15,10 +14,11 @@ class ManufacturerTest extends KernelTestCaseWithDatabase
     public function manufacturer_can_not_be_created_without_image(): void
     {
         // Given
-        $manufacturer = self::getTestObject();
+        $manufacturer = DataProvider::getManufacturer();
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
+        self::expectExceptionMessage('constraint failed: manufacturer.image_id');
 
         // When
         $this->entityManager->persist($manufacturer);
@@ -29,9 +29,9 @@ class ManufacturerTest extends KernelTestCaseWithDatabase
     public function manufacturer_can_be_created_in_database(): void
     {
         // Given
-        $image = ImageTest::getTestObject();
+        $image = DataProvider::getConfiguredImage($this->entityManager);
 
-        $manufacturer = self::getTestObject()
+        $manufacturer = DataProvider::getManufacturer()
             ->setImage($image);
 
         /** @var ManufacturerRepository $manufacturerRepository */
@@ -45,29 +45,16 @@ class ManufacturerTest extends KernelTestCaseWithDatabase
         $manufacturerRecord = $manufacturerRepository->find($manufacturer->getId());
 
         // Then
-        self::asserttestObject($manufacturerRecord);
-        ImageTest::assertTestObject($manufacturerRecord->getImage());
+        self::asserttestObject($manufacturer, $manufacturerRecord);
     }
 
     /** @test */
     public function product_is_not_deleted_when_manufacturer_is_deleted(): void
     {
         // Given
-        $manufacturer = self::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setCategory($category)
-            ->setManufacturer($manufacturer);
-
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
+        $manufacturer = $product->getManufacturer();
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
@@ -82,18 +69,13 @@ class ManufacturerTest extends KernelTestCaseWithDatabase
         self::assertNotEquals(null, $productRecord);
     }
 
-    public static function getTestObject(): Manufacturer
+    public static function asserttestObject(Manufacturer $manufacturerReference, Manufacturer $manufacturerToTest): void
     {
-        return (new Manufacturer())
-            ->setName('manufacturer_name')
-            ->setDescription('manufacturer_description');
-    }
-
-    public static function asserttestObject(Manufacturer $manufacturer): void
-    {
-        self::assertNotEquals(null, $manufacturer);
-        self::assertGreaterThan(0, $manufacturer->getId());
-        self::assertEquals('manufacturer_name', $manufacturer->getName());
-        self::assertEquals('manufacturer_description', $manufacturer->getDescription());
+        self::assertNotEquals(null, $manufacturerToTest);
+        self::assertEquals($manufacturerReference->getId(), $manufacturerToTest->getId());
+        self::assertEquals($manufacturerReference->getImage(), $manufacturerToTest->getImage());
+        self::assertEquals($manufacturerReference->getName(), $manufacturerToTest->getName());
+        self::assertEquals($manufacturerReference->getDescription(), $manufacturerToTest->getDescription());
+        self::assertEquals($manufacturerReference->getProducts(), $manufacturerToTest->getProducts());
     }
 }

@@ -26,18 +26,18 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_not_be_created_without_category(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $image = DataProvider::getConfiguredImage($this->entityManager);
 
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
+        $manufacturer = DataProvider::getConfiguredManufacturer($this->entityManager);
+
+        $product = DataProvider::getProduct()
+            ->setImage($image)
             ->setManufacturer($manufacturer);
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
 
         // When
-        $this->entityManager->persist($manufacturer);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
@@ -46,13 +46,11 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_not_be_created_without_image(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $manufacturer = DataProvider::getConfiguredManufacturer($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $category = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $product = self::getTestObject()
+        $product = DataProvider::getProduct()
             ->setManufacturer($manufacturer)
             ->setCategory($category);
 
@@ -60,8 +58,6 @@ class ProductTest extends KernelTestCaseWithDatabase
         self::expectException(NotNullConstraintViolationException::class);
 
         // When
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
@@ -70,18 +66,18 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_not_be_created_without_manufacturer(): void
     {
         // Given
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $image = DataProvider::getConfiguredImage($this->entityManager);
 
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
+        $category = DataProvider::getConfiguredCategory($this->entityManager);
+
+        $product = DataProvider::getProduct()
+            ->setImage($image)
             ->setCategory($category);
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
 
         // When
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
@@ -90,14 +86,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_be_created_in_database(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $image = DataProvider::getConfiguredImage($this->entityManager);
+        
+        $manufacturer = DataProvider::getConfiguredManufacturer($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $category = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
+        $product = DataProvider::getProduct()
+            ->setImage($image)
             ->setManufacturer($manufacturer)
             ->setCategory($category);
 
@@ -105,8 +101,6 @@ class ProductTest extends KernelTestCaseWithDatabase
         $productRepository = $this->entityManager->getRepository(Product::class);
 
         // When
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
@@ -114,38 +108,26 @@ class ProductTest extends KernelTestCaseWithDatabase
         $productRecord = $productRepository->find($product->getId());
 
         // Then
-        self::assertTestObject($productRecord);
-        ImageTest::assertTestObject($productRecord->getImage());
+        self::assertTestObject($product, $productRecord);
     }
 
     /** @test */
     public function product_can_access_other_images(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $otherImage = DataProvider::getImage($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $otherImage = ImageTest::getTestObject();
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addOtherImage($otherImage);
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
-        
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
 
         /** @var Product $productRecord */
         $productRecord = $productRepository->find($product->getId());
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
 
         // When
         $otherImageCollection = $productRecord->getOtherImages();
@@ -163,32 +145,19 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_access_subcategories(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $subcategory = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $subcategory = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addSubcategory($subcategory);
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
-        
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($subcategory);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
 
         /** @var Product $productRecord */
         $productRecord = $productRepository->find($product->getId());
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
 
         // When
         $subcategoryCollection = $productRecord->getSubcategories();
@@ -206,31 +175,19 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_access_attatchments(): void
     {
         // Given
-        $attatchment = AttatchmentTest::getTestObject();
+        $attatchment = DataProvider::getConfiguredAttatchment($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
-            ->setImage(ImageTest::getTestObject())
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addAttatchment($attatchment);
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
 
-        $this->entityManager->persist($attatchment);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
-
         /** @var Product $productRecord */
         $productRecord = $productRepository->find($product->getId());
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
 
         // Whne
         $attatchmentCollection = $productRecord->getAttatchments();
@@ -247,26 +204,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function product_can_access_discounts(): void
     {
         // Given
-        $discount = DiscountTest::getTestObject();
+        $discount = DataProvider::getConfiguredDiscount($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
-            ->setImage(ImageTest::getTestObject())
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addDiscount($discount);
 
         /** @var ProductRepository $productRepository */
         $productRepository = $this->entityManager->getRepository(Product::class);
 
-        $this->entityManager->persist($discount);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
@@ -288,26 +233,12 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function image_is_deleted_when_product_is_deleted(): void
     {
         // Given
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $image = ImageTest::getTestObject();
-
-        $product = ProductTest::getTestObject()
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
-            ->setImage($image);
+        $image = $product->getImage();
 
         /** @var ImageRepository $imageRepository */
         $imageRepository = $this->entityManager->getRepository(Image::class);
-
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
 
         $imageId = $image->getId();
 
@@ -325,25 +256,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function other_images_are_deleted_when_product_is_deleted(): void
     {
         // Given
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $otherImage = DataProvider::getConfiguredImage($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $otherImage = ImageTest::getTestObject();
-
-        $product = ProductTest::getTestObject()
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
-            ->setImage(ImageTest::getTestObject())
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addOtherImage($otherImage);
 
         /** @var ImageRepository $imageRepository */
         $imageRepository = $this->entityManager->getRepository(Image::class);
 
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
@@ -363,26 +283,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function attatchment_is_not_deleted_when_product_is_deleted(): void
     {
         // Given
-        $attatchment = AttatchmentTest::getTestObject();
+        $attatchment = DataProvider::getConfiguredAttatchment($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addAttatchment($attatchment);
 
         /** @var AttatchmentRepository $attatchmentRepository */
         $attatchmentRepository = $this->entityManager->getRepository(Attatchment::class);
 
-        $this->entityManager->persist($attatchment);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
         
@@ -403,24 +311,12 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function category_is_not_deleted_when_product_is_deleted(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category);
+        $category = $product->getCategory();
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = $this->entityManager->getRepository(Category::class);
-
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
         
         $categorytId = $category->getId();
 
@@ -439,27 +335,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function subcategories_are_not_deleted_when_product_is_deleted(): void
     {
         // Given
-        $subcategory = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $subcategory = DataProvider::getConfiguredCategory($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addSubcategory($subcategory);
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = $this->entityManager->getRepository(Category::class);
 
-        $this->entityManager->persist($subcategory);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
         
@@ -480,24 +363,12 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function manufacturer_is_not_deleted_when_product_is_deleted(): void
     {
         // Given
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category);
+        $manufacturer = $product->getManufacturer();
 
         /** @var ManufacturerRepository $manufacturerRepository */
         $manufacturerRepository = $this->entityManager->getRepository(Manufacturer::class);
-
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($product);
-        $this->entityManager->flush();
         
         $manufacturerId = $manufacturer->getId();
 
@@ -516,26 +387,14 @@ class ProductTest extends KernelTestCaseWithDatabase
     public function discounts_are_not_deleted_when_product_is_deleted(): void
     {
         // Given
-        $discount = DiscountTest::getTestObject();
+        $discount = DataProvider::getConfiguredDiscount($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = self::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category)
+        $product = DataProvider::getConfiguredProduct($this->entityManager)
             ->addDiscount($discount);
 
         /** @var DiscountRepository $discountRepository */
         $discountRepository = $this->entityManager->getRepository(Discount::class);
 
-        $this->entityManager->persist($discount);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($category);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
         
@@ -552,68 +411,19 @@ class ProductTest extends KernelTestCaseWithDatabase
         self::assertNotEquals(null, $discountRecord);
     }
 
-    // /** @test */
-    // public function product_can_not_be_deleted_while_in_order(): void
-    // {
-    //     // Given
-    //     $manufacturer = ManufacturerTest::getTestObject()
-    //         ->setImage(ImageTest::getTestObject());
-
-    //     $category = CategoryTest::getTestObject()
-    //         ->setImage(ImageTest::getTestObject());
-
-    //     $product = self::getTestObject()
-    //         ->setImage(ImageTest::getTestObject())
-    //         ->setManufacturer($manufacturer)
-    //         ->setCategory($category);
-
-    //     $user = UserTest::getTestObject();
-
-    //     $delivery = DeliveryTest::getTestObject();
-
-    //     $payment = PaymentTest::getTestObject();
-
-    //     $order = OrderTest::getTestObject()
-    //         ->setUser($user)
-    //         ->setDelivery($delivery)
-    //         ->setPaymeny($payment)
-    //         ->addProduct($product);
-
-    //     $this->entityManager->persist($manufacturer);
-    //     $this->entityManager->persist($category);
-    //     $this->entityManager->persist($product);
-    //     $this->entityManager->persist($user);
-    //     $this->entityManager->persist($delivery);
-    //     $this->entityManager->persist($payment);
-    //     $this->entityManager->persist($order);
-    //     $this->entityManager->flush();
-
-    //     // Expect
-    //     self::expectException(NotNullConstraintViolationException::class);
-
-    //     // When
-    //     $this->entityManager->remove($product);
-    //     $this->entityManager->flush();
-    // }
-
-    public static function getTestObject(): Product
+    public static function assertTestObject(Product $productReference, Product $productToTest):void
     {
-        return (new Product())
-            ->setQuantity(1.0)
-            ->setPrice(2.0)
-            ->setName('product_name')
-            ->setDescription('product_description')
-            ->setActive(true);
-    }
-
-    public static function assertTestObject($product):void
-    {
-        self::assertNotEquals(null, $product);
-        self::assertGreaterThan(0, $product->getId());
-        self::assertEquals(1, $product->getQuantity());
-        self::assertEquals(2.0, $product->getPrice());
-        self::assertEquals('product_name', $product->getName());
-        self::assertEquals('product_description', $product->getDescription());
-        self::assertEquals(true, $product->isActive());
+        self::assertNotEquals(null, $productToTest);
+        self::assertEquals($productReference->getId(), $productToTest->getId());
+        self::assertEquals($productReference->getCategory(), $productToTest->getCategory());
+        self::assertEquals($productReference->getImage(), $productToTest->getImage());
+        self::assertEquals($productReference->getSubcategories(), $productToTest->getSubcategories());
+        self::assertEquals($productReference->getOtherImages(), $productToTest->getOtherImages());
+        self::assertEquals($productReference->getQuantity(), $productToTest->getQuantity());
+        self::assertEquals($productReference->getPrice(), $productToTest->getPrice());
+        self::assertEquals($productReference->getName(), $productToTest->getName());
+        self::assertEquals($productReference->getDescription(), $productToTest->getDescription());
+        self::assertEquals($productReference->getDiscounts(), $productToTest->getDiscounts());
+        self::assertEquals($productReference->isActive(), $productToTest->isActive());
     }
 }

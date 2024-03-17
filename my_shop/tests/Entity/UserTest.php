@@ -5,8 +5,7 @@ namespace App\Test\Entity;
 use App\Entity\Address;
 use App\Entity\Contact;
 use App\Entity\User;
-use App\Tests\Entity\AddressTest;
-use App\Tests\Entity\ContactTest;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
 
 class UserTest extends KernelTestCaseWithDatabase
@@ -15,7 +14,7 @@ class UserTest extends KernelTestCaseWithDatabase
     public function user_can_be_created_in_database(): void
     {
         // Given
-        $user = self::getTestObject();
+        $user = DataProvider::getUser();
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
@@ -28,16 +27,16 @@ class UserTest extends KernelTestCaseWithDatabase
         $userRecord = $userRepository->find($user->getId());
 
         // Then
-        self::assertTestObject($userRecord);
+        self::assertTestObject($user, $userRecord);
     }
 
     /** @test */
     public function user_can_access_address(): void
     {
         // Given
-        $address = AddressTest::getTestObject();
+        $address = DataProvider::getConfiguredAddress($this->entityManager);
 
-        $user = self::getTestObject()
+        $user = DataProvider::getUser()
             ->setAddress($address);
 
         /** @var UserRepository $userRepository */
@@ -46,8 +45,6 @@ class UserTest extends KernelTestCaseWithDatabase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $addressId = $address->getId();
-
         /** @var User $userRecord */
         $userRecord = $userRepository->find($user->getId());
 
@@ -55,7 +52,7 @@ class UserTest extends KernelTestCaseWithDatabase
         $addressRecord = $userRecord->getAddress();
 
         // Then
-        self::assertEquals($addressId, $addressRecord->getId());
+        self::assertEquals($address->getId(), $addressRecord->getId());
     }
 
     
@@ -63,16 +60,16 @@ class UserTest extends KernelTestCaseWithDatabase
     public function address_is_deleted_when_user_is_deleted(): void
     {
         // Given
-        $address = AddressTest::getTestObject();
+        $address = DataProvider::getConfiguredAddress($this->entityManager);
 
-        $user = UserTest::getTestObject();
-        $user->setAddress($address);
-
-        /** @var AddressRepository $addressRepository */
-        $addressRepository = $this->entityManager->getRepository(Address::class);
+        $user = DataProvider::getConfiguredUser($this->entityManager)
+            ->setAddress($address);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        /** @var AddressRepository $addressRepository */
+        $addressRepository = $this->entityManager->getRepository(Address::class);
 
         $addressId = $address->getId();
 
@@ -91,19 +88,16 @@ class UserTest extends KernelTestCaseWithDatabase
     public function user_can_access_contact(): void
     {
         // Given
-        $contact = ContactTest::getTestObject();
+        $contact = DataProvider::getConfiguredContact($this->entityManager);
 
-        $user = self::getTestObject()
+        $user = DataProvider::getUser()
             ->setContact($contact);
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
 
-        // When
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-
-        $contactId = $contact->getId();
 
         /** @var User $userRecord */
         $userRecord = $userRepository->find($user->getId());
@@ -112,23 +106,23 @@ class UserTest extends KernelTestCaseWithDatabase
         $contactRecord = $userRecord->getContact();
 
         // Then
-        self::assertEquals($contactId, $contactRecord->getId());
+        self::assertEquals($contact->getId(), $contactRecord->getId());
     }
 
     /** @test */
     public function contact_is_deleted_when_user_is_deleted(): void
     {
         // Given
-        $contact = ContactTest::getTestObject();
+        $contact = DataProvider::getConfiguredContact($this->entityManager);
 
-        $user = UserTest::getTestObject();
-        $user->setContact($contact);
-
-        /** @var ContactRepository $contactRepository */
-        $contactRepository = $this->entityManager->getRepository(Contact::class);
+        $user = DataProvider::getConfiguredUser($this->entityManager)
+            ->setContact($contact);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        /** @var ContactRepository $contactRepository */
+        $contactRepository = $this->entityManager->getRepository(Contact::class);
 
         $contactId = $contact->getId();
 
@@ -143,21 +137,17 @@ class UserTest extends KernelTestCaseWithDatabase
         self::assertEquals(null, $contactRecord);
     }
 
-    public static function getTestObject(): User
+    public static function assertTestObject(User $userReference, User $userToTest): void
     {
-        $user = new User();
-        $user->setEmail('test@test.test');
-        $user->setRoles(['ROLE_TEST']);
-        $user->setPassword('user_password');
-        return $user;
-    }
-
-    public static function assertTestObject($user): void
-    {
-        self::assertNotEquals(null, $user);
-        self::assertGreaterThan(0, $user->getId());
-        self::assertEquals('test@test.test', $user->getEmail());
-        self::assertEquals(['ROLE_TEST', 'ROLE_USER'], $user->getRoles());
-        self::assertEquals('user_password', $user->getPassword());
+        self::assertNotEquals(null, $userToTest);
+        self::assertEquals($userReference->getId(), $userToTest->getId());
+        self::assertEquals($userReference->getEmail(), $userToTest->getEmail());
+        self::assertEquals($userReference->getRoles(), $userToTest->getRoles());
+        self::assertEquals($userReference->getPassword(), $userToTest->getPassword());
+        self::assertEquals($userReference->getAddress(), $userToTest->getAddress());
+        self::assertEquals($userReference->getContact(), $userToTest->getContact());
+        self::assertEquals($userReference->getCart(), $userToTest->getCart());
+        self::assertEquals($userReference->getOrders(), $userToTest->getOrders());
+        self::assertEquals($userReference->isVerified(), $userToTest->isVerified());
     }
 }

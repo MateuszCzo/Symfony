@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class WebTestCaseWithDatabase extends WebTestCase
+abstract class WebTestCaseWithDatabase extends WebTestCase
 {
     protected EntityManagerInterface $entityManager;
 

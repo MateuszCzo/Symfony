@@ -4,13 +4,9 @@ namespace App\Test\Controller;
 
 use App\Entity\User;
 use App\Security\EmailVerifier;
-use App\Test\Entity\UserTest;
+use App\Tests\DataProvider;
 use App\Tests\WebTestCaseWithDatabase;
-use Exception;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistrationControllerTest extends WebTestCaseWithDatabase
@@ -142,12 +138,7 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
     public function user_can_not_be_created_when_email_is_used(): void
     {
         // Given
-        $user = (new User())
-            ->setEmail('test@test.test')
-            ->setPassword('user_password');
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $user = DataProvider::getConfiguredUser($this->entityManager);
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
@@ -170,7 +161,11 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
         // Then
         self::assertResponseStatusCodeSame(422);
         self::assertSelectorTextContains('li', 'There is already an account with this email');
-        self::assertEquals(1, count($userRepository->findAll()));
+
+        /** @var Collection $userCollection */
+        $userCollection = $userRepository->findBy(['email' => $user->getEmail()]);
+
+        self::assertCount(1, $userCollection);
     }
 
     /** @test */
@@ -187,9 +182,7 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
         
         self::getContainer()->set(EmailVerifier::class, $emailVerifierMock);
 
-        $user = (new User())
-            ->setEmail('test@test.test')
-            ->setPassword('user_password');
+        $user = DataProvider::getUser();
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
@@ -239,9 +232,7 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
         
         self::getContainer()->set(UserPasswordHasherInterface::class, $userPasswordHasher);
 
-        $user = (new User())
-            ->setEmail('test@test.test')
-            ->setPassword('user_password');
+        $user = DataProvider::getUser();
 
         /** @var Crawler $crawlerGET */
         $crawlerGET = $this->client->request('GET', '/register');
@@ -286,9 +277,7 @@ class RegistrationControllerTest extends WebTestCaseWithDatabase
         
         self::getContainer()->set(UserPasswordHasherInterface::class, $userPasswordHasher);
 
-        $user = (new User())
-            ->setEmail('test@test.test')
-            ->setPassword('user_password');
+        $user = DataProvider::getUser();
 
         /** @var Crawler $crawler */
         $crawler = $this->client->request('GET', '/register');

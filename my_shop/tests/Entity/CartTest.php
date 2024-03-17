@@ -3,9 +3,8 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Cart;
-use App\Test\Entity\UserTest;
+use App\Tests\DataProvider;
 use App\Tests\KernelTestCaseWithDatabase;
-use App\Tests\ProductTest;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 
 class CartTest extends KernelTestCaseWithDatabase
@@ -14,10 +13,11 @@ class CartTest extends KernelTestCaseWithDatabase
     public function cart_can_not_be_created_without_user(): void
     {
         // Given
-        $cart = self::getTestObject();
+        $cart = DataProvider::getCart();
 
         // Expect
         self::expectException(NotNullConstraintViolationException::class);
+        self::expectExceptionMessage('constraint failed: cart.user_id');
 
         // When
         $this->entityManager->persist($cart);
@@ -28,15 +28,15 @@ class CartTest extends KernelTestCaseWithDatabase
     public function cart_can_be_created_in_database(): void
     {
         // Given
-        $user = UserTest::getTestObject();
-        $cart = self::getTestObject()
+        $user = DataProvider::getConfiguredUser($this->entityManager);
+
+        $cart = DataProvider::getCart()
             ->setUser($user);
 
         /** @var CartRepository $cartRepository */
         $cartRepository = $this->entityManager->getRepository(Cart::class);
 
         // When
-        $this->entityManager->persist($user);
         $this->entityManager->persist($cart);
         $this->entityManager->flush();
 
@@ -46,36 +46,19 @@ class CartTest extends KernelTestCaseWithDatabase
         $cartRecord = $cartRepository->find($cartId);
 
         // Then
-        self::assertTestObject($cartRecord);
+        self::assertTestObject($cart, $cartRecord);
     }
 
     public function cart_can_access_products(): void
     {
         // Given
-        $category = CategoryTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
+        $product = DataProvider::getConfiguredProduct($this->entityManager);
 
-        $manufacturer = ManufacturerTest::getTestObject()
-            ->setImage(ImageTest::getTestObject());
-
-        $product = ProductTest::getTestObject()
-            ->setImage(ImageTest::getTestObject())
-            ->setManufacturer($manufacturer)
-            ->setCategory($category);
-
-        $user = UserTest::getTestObject();
-        $cart = self::getTestObject()
-            ->setUser($user)
+        $cart = DataProvider::getConfiguredCart($this->entityManager)
             ->addProduct($product);
 
-        $this->entityManager->persist($category);
-        $this->entityManager->persist($manufacturer);
-        $this->entityManager->persist($product);
-        $this->entityManager->persist($user);
         $this->entityManager->persist($cart);
         $this->entityManager->flush();
-
-        $productId = $product->getId();
         
         /** @var CartRepository $cartRepository */
         $cartRepository = $this->entityManager->getRepository(Cart::class);
@@ -92,25 +75,19 @@ class CartTest extends KernelTestCaseWithDatabase
         /** @var Product $productRecord */
         $productRecord = $productCollection->first();
 
-        self::assertEquals($productId, $productRecord->getId());
+        self::assertEquals($product->getId(), $productRecord->getId());
     }
 
     public function cart_can_access_discounts(): void
     {
         // Given
-        $discount = DiscountTest::getTestObject();
+        $discount = DataProvider::getConfiguredDiscount($this->entityManager);
 
-        $user = UserTest::getTestObject();
-        $cart = self::getTestObject()
-            ->setUser($user)
+        $cart = DataProvider::getConfiguredCart($this->entityManager)
             ->addDiscount($discount);
 
-        $this->entityManager->persist($discount);
-        $this->entityManager->persist($user);
         $this->entityManager->persist($cart);
         $this->entityManager->flush();
-
-        $discountId = $discount->getId();
 
         /** @var CartRepository $cartRepository */
         $cartRepository = $this->entityManager->getRepository(Cart::class);
@@ -127,19 +104,16 @@ class CartTest extends KernelTestCaseWithDatabase
         /** @var Discount $discountRecord */
         $discountRecord = $discountCollection->first();
 
-        self::assertEquals($discountId, $discountRecord->getId());
+        self::assertEquals($discount->getId(), $discountRecord->getId());
     }
 
-    public static function getTestObject(): Cart
+    public static function assertTestObject(Cart $cartReference, Cart $cartToTest): void
     {
-        return (new Cart())
-            ->setPrice(1.0);
-    }
-
-    public static function assertTestObject(Cart $cart): void
-    {
-        self::assertNotEquals(null, $cart);
-        self::assertGreaterThan(0, $cart->getId());
-        self::assertEquals(1, $cart->getPrice());
+        self::assertNotEquals(null, $cartToTest);
+        self::assertEquals($cartReference->getID(), $cartToTest->getId());
+        self::assertEquals($cartReference->getPrice(), $cartToTest->getPrice());
+        self::assertEquals($cartReference->getUser(), $cartToTest->getUser());
+        self::assertEquals($cartReference->getProducts(), $cartToTest->getProducts());
+        self::assertEquals($cartReference->getDiscounts(), $cartToTest->getDiscounts());
     }
 }
