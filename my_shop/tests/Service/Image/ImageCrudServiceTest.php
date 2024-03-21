@@ -106,8 +106,8 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         self::assertEquals('png', $image->getType());
 
         self::assertFalse(file_exists(__DIR__ . '/../../public/uploads/tmp/test.png'));
-        self::assertTrue(file_exists(__DIR__ . '/../../../public' . $image->getPath() . '/' . $image->getName() . '.' . $image->getType()));
+        self::assertTrue(file_exists(__DIR__ . '/../../../public' . $updatedImage->getPath() . '/' . $updatedImage->getName() . '.' . $updatedImage->getType()));
 
-        unlink(__DIR__ . '/../../../public' . $image->getPath() . '/' . $image->getName() . '.' . $image->getType());
+        unlink(__DIR__ . '/../../../public' . $updatedImage->getPath() . '/' . $updatedImage->getName() . '.' . $updatedImage->getType());
     }
 }
