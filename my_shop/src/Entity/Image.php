@@ -22,6 +22,9 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'otherImages')]
     private ?Product $product = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $path = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class Image
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function setPath(string $path): static
+    {
+        $this->path = $path;
 
         return $this;
     }

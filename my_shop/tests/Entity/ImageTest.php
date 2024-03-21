@@ -61,6 +61,7 @@ class ImageTest extends KernelTestCaseWithDatabase
         self::assertNotEquals(null, $imageToTest);
         self::assertEquals($imageReference->getId(), $imageToTest->getId());
         self::assertEquals($imageReference->getName(), $imageToTest->getName());
+        self::assertEquals($imageReference->getPath(), $imageToTest->getPath());
         self::assertEquals($imageReference->getType(), $imageToTest->getType());
         self::assertEquals($imageReference->getProduct(), $imageToTest->getProduct());
     }

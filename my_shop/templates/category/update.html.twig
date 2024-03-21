@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Category Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Category Create</h1>
+
+    {{ form_errors(categoryUpdateFrom) }}
+
+    {{ form_start(categoryUpdateFrom) }}
+        {{ form_widget(categoryUpdateFrom) }}
+
+        <button type="submit" class="btn">Update</button>
+    {{ form_end(categoryUpdateFrom) }}
+{% endblock %}

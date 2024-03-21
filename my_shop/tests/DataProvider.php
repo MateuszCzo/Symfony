@@ -79,6 +79,7 @@ class DataProvider
     {
         return (new Image())
             ->setName('image_name')
+            ->setPath('image_path')
             ->setType('image_type');
     }
 
