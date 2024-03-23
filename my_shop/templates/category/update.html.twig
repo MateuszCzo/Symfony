@@ -11,13 +11,13 @@
         {% endfor %}
     {% endfor %}
 
-    <h1>Category Create</h1>
+    <h1>Category Update</h1>
 
-    {{ form_errors(categoryUpdateFrom) }}
+    {{ form_errors(categoryUpdateForm) }}
 
-    {{ form_start(categoryUpdateFrom) }}
-        {{ form_widget(categoryUpdateFrom) }}
+    {{ form_start(categoryUpdateForm) }}
+        {{ form_widget(categoryUpdateForm) }}
 
         <button type="submit" class="btn">Update</button>
-    {{ form_end(categoryUpdateFrom) }}
+    {{ form_end(categoryUpdateForm) }}
 {% endblock %}

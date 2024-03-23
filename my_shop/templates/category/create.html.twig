@@ -13,11 +13,11 @@
 
     <h1>Category Create</h1>
 
-    {{ form_errors(categoryCreateFrom) }}
+    {{ form_errors(categoryCreateForm) }}
 
-    {{ form_start(categoryCreateFrom) }}
-        {{ form_widget(categoryCreateFrom) }}
+    {{ form_start(categoryCreateForm) }}
+        {{ form_widget(categoryCreateForm) }}
 
         <button type="submit" class="btn">Create</button>
-    {{ form_end(categoryCreateFrom) }}
+    {{ form_end(categoryCreateForm) }}
 {% endblock %}

@@ -49,7 +49,7 @@ class CategoryController extends AbstractController
 
         if (!($form->isSubmitted() && $form->isValid())) {
             return $this->render('category/create.html.twig', [
-                'categoryCreateFrom' => $form,
+                'categoryCreateForm' => $form,
             ]);
         }
 
@@ -82,7 +82,7 @@ class CategoryController extends AbstractController
 
         if (!($form->isSubmitted() && $form->isValid())) {
             return $this->render('category/update.html.twig', [
-                'categoryUpdateFrom' => $form,
+                'categoryUpdateForm' => $form,
             ]);
         }
 
