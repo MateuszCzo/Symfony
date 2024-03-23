@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Payment Update</h1>
+
+    {{ form_errors(paymentUpdateForm) }}
+
+    {{ form_start(paymentUpdateForm) }}
+        {{ form_widget(paymentUpdateForm) }}
+
+        <button type="submit" class="btn">Update</button>
+    {{ form_end(paymentUpdateForm) }}
+{% endblock %}
