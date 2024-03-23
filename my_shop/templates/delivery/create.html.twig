@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Delivery Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Delivery Create</h1>
+
+    {{ form_errors(deliveryCreateForm) }}
+
+    {{ form_start(deliveryCreateForm) }}
+        {{ form_widget(deliveryCreateForm) }}
+
+        <button type="submit" class="btn">Create</button>
+    {{ form_end(deliveryCreateForm) }}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Delivery Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="example-wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery in deliveries %}
+                    <tr>
+                        <td scope="row">{{ delivery.getId() }}</td>
+                        <td>{{ delivery.getName() }}</td>
+                        <td>{{ delivery.getType() }}</td>
+                        <td>{{ delivery.isActive() ? 'active' : 'not active' }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_delivery_delete', { 'id': delivery.getId() }) }}">DELETE</a>
+                            <a href="{{ path('app_admin_delivery_update', { 'id': delivery.getId() }) }}">UPDATE</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
