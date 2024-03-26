@@ -6,7 +6,7 @@ use App\Repository\AttatchmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AttatchmentRepository::class)]
-class Attatchment
+class Attatchment implements FileInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,12 +25,15 @@ class Attatchment
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $path = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -66,7 +69,7 @@ class Attatchment
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -76,5 +79,22 @@ class Attatchment
         $this->type = $type;
 
         return $this;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function setPath(string $path): static
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    public function getFullPath(): string
+    {
+        return $this->path . '/' . $this->fileName . '.' . $this->type;
     }
 }

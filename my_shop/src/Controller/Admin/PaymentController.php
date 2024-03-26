@@ -17,7 +17,8 @@ class PaymentController extends AbstractController
     private EntityManagerInterface $entityManager;
 
     public function __construct(PaymentRepository $paymentRepository,
-                                EntityManagerInterface $entityManager) {
+                                EntityManagerInterface $entityManager)
+    {
         $this->paymentRepository = $paymentRepository;
         $this->entityManager = $entityManager;
     }

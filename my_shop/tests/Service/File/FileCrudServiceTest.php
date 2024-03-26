@@ -3,11 +3,11 @@
 namespace App\Test\Service\Image;
 
 use App\Entity\Image;
-use App\Service\Image\ImageCrudService;
+use App\Service\File\FileCrudService;
 use App\Tests\KernelTestCaseWithDatabase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageCrudServiceTest extends KernelTestCaseWithDatabase
+class FileCrudServiceTest extends KernelTestCaseWithDatabase
 {
     /** @test */
     public function image_created_successfully(): void
@@ -15,14 +15,14 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         // Given
         copy(__DIR__ . '/../../Fixtures/Images/test.png', __DIR__ . '/../../tmp/test.png');
 
-        /** @var ImageCrudService $imageCrudService */
-        $imageCrudService = self::getContainer()->get(ImageCrudService::class);
+        /** @var FileCrudService $fileCrudService */
+        $fileCrudService = self::getContainer()->get(FileCrudService::class);
 
         $uploadedImage = new UploadedFile(__DIR__ . '/../../tmp/test.png', 'test.png', 'image/png', null, true);
 
         // When
         /** @var Image $image */
-        $image = $imageCrudService->create($uploadedImage, '/uploads/tmp');
+        $image = $fileCrudService->create($uploadedImage, '/uploads/tmp', new Image());
 
         // Then
         self::assertEquals('/uploads/tmp', $image->getPath());
@@ -40,8 +40,8 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         // Given
         $container = self::getContainer();
 
-        /** @var ImageCrudService $imageCrudService */
-        $imageCrudService = $container->get(ImageCrudService::class);
+        /** @var FileCrudService $fileCrudService */
+        $fileCrudService = $container->get(FileCrudService::class);
 
         $image = (new Image)
             ->setName('test')
@@ -51,7 +51,7 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         $this->entityManager->persist($image);
         $this->entityManager->flush();
     
-        $imageExists = $imageCrudService->exists($image);
+        $imageExists = $fileCrudService->exists($image);
 
         // Then
         self::assertTrue($imageExists);
@@ -63,8 +63,8 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         // Given
         $container = self::getContainer();
 
-        /** @var ImageCrudService $imageCrudService */
-        $imageCrudService = $container->get(ImageCrudService::class);
+        /** @var FileCrudService $fileCrudService */
+        $fileCrudService = $container->get(FileCrudService::class);
 
         $image = (new Image)
             ->setName('test')
@@ -74,7 +74,7 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
         $this->entityManager->persist($image);
         $this->entityManager->flush();
     
-        $imageExists = $imageCrudService->exists($image);
+        $imageExists = $fileCrudService->exists($image);
 
         // Then
         self::assertFalse($imageExists);
@@ -94,11 +94,11 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
 
         $uploadedImage = new UploadedFile(__DIR__ . '/../../tmp/test2.png', 'test2.png', 'png', null, true);
 
-        /** @var ImageCrudService $imageCrudService */
-        $imageCrudService = self::getContainer()->get(ImageCrudService::class);
+        /** @var FileCrudService $fileCrudService */
+        $fileCrudService = self::getContainer()->get(FileCrudService::class);
 
         // When
-        $updatedImage = $imageCrudService->update($image, $uploadedImage);
+        $updatedImage = $fileCrudService->update($image, $uploadedImage);
 
         // Then
         self::assertEquals('/uploads/tmp', $image->getPath());
@@ -107,6 +107,33 @@ class ImageCrudServiceTest extends KernelTestCaseWithDatabase
 
         self::assertFalse(file_exists(__DIR__ . '/../../public/uploads/tmp/test.png'));
         self::assertTrue(file_exists(__DIR__ . '/../../../public' . $updatedImage->getPath() . '/' . $updatedImage->getName() . '.' . $updatedImage->getType()));
+
+        unlink(__DIR__ . '/../../../public' . $updatedImage->getPath() . '/' . $updatedImage->getName() . '.' . $updatedImage->getType());
+    }
+
+    /** @test */
+    public function image_is_not_changed_without_new_uploaded_image(): void
+    {
+        // Given
+        copy(__DIR__ . '/../../Fixtures/Images/test.png', __DIR__ . '/../../../public/uploads/tmp/test.png');
+
+        $image = (new Image)
+            ->setName('test')
+            ->setType('png')
+            ->setPath('/uploads/tmp');
+
+        /** @var FileCrudService $fileCrudService */
+        $fileCrudService = self::getContainer()->get(FileCrudService::class);
+
+        // When
+        $updatedImage = $fileCrudService->update($image, null);
+
+        // Then
+        self::assertEquals('/uploads/tmp', $image->getPath());
+        self::assertEquals('test', $image->getName());
+        self::assertEquals('png', $image->getType());
+
+        self::assertEquals($image,  $updatedImage);
 
         unlink(__DIR__ . '/../../../public' . $updatedImage->getPath() . '/' . $updatedImage->getName() . '.' . $updatedImage->getType());
     }

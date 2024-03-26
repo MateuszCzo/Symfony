@@ -28,8 +28,7 @@
                         <th scope="row">{{ category.getId() }}</th>
                         <td>
                             <img style="height: 35px"
-                                {% set image = category.getImage() %}
-                                src="{{ image.getPath() ~ '/' ~ image.getName() ~ '.' ~ image.getType() }}" 
+                                src="{{ category.getImage().getFullPath() }}" 
                                 alt="{{ image.getName() }}">
                         </td>
                         <td>{{ category.getParent() ? category.getParent().getId() : '' }}</td>

@@ -4,11 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Constants\CategoryConstants;
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Form\CategoryType;
 use App\Form\CategoryUpdateType;
 use App\Form\Validator\CategoryParentValidator;
 use App\Repository\CategoryRepository;
-use App\Service\Image\ImageCrudService;
+use App\Service\File\FileCrudService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,21 +19,22 @@ use Symfony\Component\Routing\Annotation\Route;
 class CategoryController extends AbstractController
 {
     private CategoryRepository $categoryRepository;
-    private ImageCrudService $imageCrudService;
+    private FileCrudService $fileCrudService;
     private EntityManagerInterface $entityManager;
 
     public function __construct(CategoryRepository $categoryRepository,
-                                ImageCrudService $imageCrudService,
+                                FileCrudService $fileCrudService,
                                 EntityManagerInterface $entityManager)
     {
         $this->categoryRepository = $categoryRepository;
-        $this->imageCrudService = $imageCrudService;
+        $this->fileCrudService = $fileCrudService;
         $this->entityManager = $entityManager;
     }
 
     #[Route('/admin/category/list', name: 'app_admin_category_list', methods: ['GET'])]
     public function list(): Response
     {
+        /** @var Category[] $categories */
         $categories = $this->categoryRepository->findAll();
 
         return $this->render('category/list.html.twig', [
@@ -53,9 +55,11 @@ class CategoryController extends AbstractController
             ]);
         }
 
-        $image = $this->imageCrudService->create(
+        /** @var Image $image */
+        $image = $this->fileCrudService->create(
             $form->get('image')->getData(),
-            CategoryConstants::IMAGE_UPLOAD_PATH
+            CategoryConstants::IMAGE_UPLOAD_PATH,
+            new Image(),
         );
 
         $category->setImage($image);
@@ -63,6 +67,7 @@ class CategoryController extends AbstractController
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
+        $this->addFlash('success', 'Category created successfult');
         return $this->redirectToRoute('app_admin_category_list');
     }
 
@@ -91,19 +96,18 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_admin_category_update', ['id' => $category->getId()]);
         }
 
-        $updatedImage = $form->get('image')->getData();
+        /** @var Image $image */
+        $image = $this->fileCrudService->update(
+            $category->getImage(),
+            $form->get('image')->getData()
+        );
 
-        if ($updatedImage) {
-            $image = $this->imageCrudService->update(
-                $category->getImage(),
-                $updatedImage
-            );
-            $category->setImage($image);
-        }
+        $category->setImage($image);
 
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
+        $this->addFlash('success', 'Category updated sucessfuly');
         return $this->redirectToRoute('app_admin_category_list');
     }
 
@@ -123,11 +127,12 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('app_admin_category_list');
         }
 
-        $this->imageCrudService->delete($category->getImage());
+        $this->fileCrudService->delete($category->getImage());
 
         $this->entityManager->remove($category);
         $this->entityManager->flush();
 
+        $this->addFlash('success', 'Category deleted successfuly');
         return $this->redirectToRoute('app_admin_category_list');
     }
 }

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Attatchment Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Attatchment Update</h1>
+
+    {{ form_errors(attatchmentUpdateForm) }}
+
+    {{ form_start(attatchmentUpdateForm) }}
+        {{ form_widget(attatchmentUpdateForm) }}
+
+        <button type="submit" class="btn">Update</button>
+    {{ form_end(attatchmentUpdateForm) }}
+{% endblock %}

@@ -20,7 +20,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Service\Image\ImageCrudService:
+    App\Service\File\FileCrudService:
         arguments:
             $projectDirectory: '%kernel.project_dir%'
             $filesystem: '@filesystem'

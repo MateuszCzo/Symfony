@@ -6,7 +6,6 @@ use App\Constants\ManufacturerConstants;
 use App\Entity\Manufacturer;
 use App\Form\ManufacturerType;
 use App\Repository\ManufacturerRepository;
-use App\Service\Image\ImageCrudService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,20 +13,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Image;
 use App\Form\ManufacturerUpdateType;
+use App\Service\File\FileCrudService;
 
 class ManufacturerController extends AbstractController
 {
     private ManufacturerRepository $manufacturerRepository;
     private EntityManagerInterface $entityManager;
-    private ImageCrudService $imageCrudService;
+    private FileCrudService $fileCrudService;
 
     public function __construct(ManufacturerRepository $manufacturerRepository,
                                 EntityManagerInterface $entityManager,
-                                ImageCrudService $imageCrudService)
+                                FileCrudService $fileCrudService)
     {
         $this->manufacturerRepository = $manufacturerRepository;
         $this->entityManager = $entityManager;
-        $this->imageCrudService = $imageCrudService;
+        $this->fileCrudService = $fileCrudService;
     }
 
     #[Route('/admin/manufacturer/list', name: 'app_admin_manufacturer_list', methods: ['GET'])]
@@ -55,9 +55,10 @@ class ManufacturerController extends AbstractController
         }
 
         /** @var Image $image */
-        $image = $this->imageCrudService->create(
+        $image = $this->fileCrudService->create(
             $form->get('image')->getData(),
-            ManufacturerConstants::IMAGE_UPLOAD_PATH
+            ManufacturerConstants::IMAGE_UPLOAD_PATH,
+            new Image(),
         );
 
         $manufacturer->setImage($image);
@@ -93,9 +94,10 @@ class ManufacturerController extends AbstractController
         $updatedImage = $form->get('image')->getData();
 
         if ($updatedImage) {
-            $image = $this->imageCrudService->update(
+            $image = $this->fileCrudService->update(
                 $manufacturer->getImage(),
-                $updatedImage
+                $updatedImage,
+                new Image(),
             );
             $manufacturer->setImage($image);
         }
@@ -119,7 +121,7 @@ class ManufacturerController extends AbstractController
             return $this->redirectToRoute('app_admin_manufacturer_list');
         }
 
-        $this->imageCrudService->delete($manufacturer->getImage());
+        $this->fileCrudService->delete($manufacturer->getImage());
 
         $this->entityManager->remove($manufacturer);
         $this->entityManager->flush();

@@ -17,7 +17,8 @@ class DeliveryController extends AbstractController
     private EntityManagerInterface $entityManager;
     
     public function __construct(DeliveryRepository $deliveryRepository,
-                                EntityManagerInterface $entityManager) {
+                                EntityManagerInterface $entityManager)
+    {
         $this->deliveryRepository = $deliveryRepository;
         $this->entityManager = $entityManager;
     }
