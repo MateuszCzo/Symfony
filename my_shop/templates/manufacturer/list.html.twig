@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manufacturer Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="example-wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for manufacturer in manufacturers %}
+                    <tr>
+                        <th scope="row">{{ manufacturer.getId() }}</th>
+                        <td>
+                            <img style="height: 35px"
+                                {% set image = manufacturer.getImage() %}
+                                src="{{ image.getPath() ~ '/' ~ image.getName() ~ '.' ~ image.getType() }}" 
+                                alt="{{ image.getName() }}">
+                        </td>
+                        <td>{{ manufacturer.getName() }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_manufacturer_delete', { 'id': manufacturer.getId() }) }}">DELETE</a>
+                            <a href="{{ path('app_admin_manufacturer_update', { 'id': manufacturer.getId() }) }}">UPDATE</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

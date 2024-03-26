@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manufacturer Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Manufacturer Create</h1>
+
+    {{ form_errors(manufacturerCreateForm) }}
+
+    {{ form_start(manufacturerCreateForm) }}
+        {{ form_widget(manufacturerCreateForm) }}
+
+        <button type="submit" class="btn">Create</button>
+    {{ form_end(manufacturerCreateForm) }}
+{% endblock %}
