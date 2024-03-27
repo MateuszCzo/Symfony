@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="example-wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Manufacturer</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td scope="row">{{ product.getId() }}</td>
+                        <td scope="row">{{ product.getCategory().getName() }}</td>
+                        <td>
+                            <img style="height: 35px;" src="{{ product.getImage().getFullPath() }}">
+                        </td>
+                        <td>{{ product.getQuantity() }}</td>
+                        <td>{{ product.getPrice() }}</td>
+                        <td>{{ product.getName() }}</td>
+                        <td>{{ product.isActive() ? 'active' : 'not active' }}</td>
+                        <td>{{ product.getManufacturer().getName() }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_product_delete', { 'id': product.getId() }) }}">DELETE</a>
+                            <a href="{{ path('app_admin_product_update', { 'id': product.getId() }) }}">UPDATE</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

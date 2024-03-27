@@ -9,6 +9,7 @@
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="{{ asset('assets/js/lib/jQuery.js') }}"></script>
         {% endblock %}
     </head>
     <body>

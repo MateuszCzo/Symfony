@@ -54,7 +54,7 @@ class AttatchmentController extends AbstractController
 
         $attatchment = $this->fileCrudService->create(
             $form->get('file')->getData(),
-            AttatchmentConstants::File_UPLOAD_PATH,
+            AttatchmentConstants::FILE_UPLOAD_PATH,
             $attatchment
         );
 

@@ -25,5 +25,13 @@ services:
             $projectDirectory: '%kernel.project_dir%'
             $filesystem: '@filesystem'
 
+    App\Controller\Admin\ProductController:
+        arguments:
+            $projectDirectory: '%kernel.project_dir%'
+
+    App\Mapper\OtherImagesMapper:
+        arguments:
+            $router: '@router'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

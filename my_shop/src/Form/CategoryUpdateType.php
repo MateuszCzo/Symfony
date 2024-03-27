@@ -12,7 +12,6 @@ class CategoryUpdateType extends CategoryType
     {
         parent::buildForm($builder, $options);
         $builder
-            ->remove('image')
             ->add('image', FileType::class, [
                 'mapped' => false,
                 'label' => 'Image',

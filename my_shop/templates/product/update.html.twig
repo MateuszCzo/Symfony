@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Controller{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/controller/admin/product/deleteImage.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Product Update</h1>
+
+    {{ form_errors(productUpdateForm) }}
+
+    {{ form_start(productUpdateForm) }}
+        {{ form_widget(productUpdateForm) }}
+
+        <div>
+            {% for otherImageDto in otherImagesDto %}
+                <div>
+                    <button type="button" data-image-delete-url="{{ otherImageDto.getImageDeleteUrl() }}" class="delete-image-js">DELETE</button>
+                    <img style="height: 35px;" src="{{ asset(otherImageDto.getFullPath()) }}">
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn">Update</button>
+    {{ form_end(productUpdateForm) }}
+{% endblock %}

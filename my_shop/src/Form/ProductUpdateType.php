@@ -5,25 +5,24 @@ namespace App\Form;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
-class AttatchmentUpdateType extends AttatchmentType
+class ProductUpdateType extends ProductType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
         $builder
-            ->add('file', FileType::class, [
+            ->add('image', FileType::class, [
                 'mapped' => false,
+                'label' => 'Image',
                 'required' => false,
-                'label' => 'File',
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [
-                            'application/pdf',
+                            'image/*',
                         ],
-                        'mimeTypesMessage' => 'Please upload a valid file',
+                        'mimeTypesMessage' => 'Please upload a valid image',
                     ]),
                 ],
             ])

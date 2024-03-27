@@ -4,5 +4,5 @@ namespace App\Constants;
 
 class AttatchmentConstants
 {
-    public const File_UPLOAD_PATH = '/uploads/attatchemnt';
+    public const FILE_UPLOAD_PATH = '/uploads/attatchemnt';
 }
