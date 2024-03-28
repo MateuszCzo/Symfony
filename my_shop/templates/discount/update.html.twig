@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Discount Controller{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/controller/admin/discount/discountTypeSwitch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Discount Update</h1>
+
+    {{ form_errors(discountUpdateForm) }}
+
+    {{ form_start(discountUpdateForm) }}
+        {{ form_widget(discountUpdateForm) }}
+
+        <button type="submit" class="btn">Update</button>
+    {{ form_end(discountUpdateForm) }}
+{% endblock %}

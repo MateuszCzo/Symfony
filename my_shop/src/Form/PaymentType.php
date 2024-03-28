@@ -48,7 +48,7 @@ class PaymentType extends AbstractType
                 'label' => 'Type',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter delivery description',
+                        'message' => 'Please enter payment type',
                     ]),
                 ],
             ])

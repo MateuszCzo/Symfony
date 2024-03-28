@@ -28,7 +28,7 @@
                         <td>
                             <img style="height: 35px"
                                 {% set image = manufacturer.getImage() %}
-                                src="{{ image.getPath() ~ '/' ~ image.getName() ~ '.' ~ image.getType() }}" 
+                                src="{{ image.getFullPath() }}" 
                                 alt="{{ image.getName() }}">
                         </td>
                         <td>{{ manufacturer.getName() }}</td>

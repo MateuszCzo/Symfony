@@ -26,7 +26,7 @@
                     <tr>
                         <th scope="row">{{ attatchment.getId() }}</th>
                         <td>{{ attatchment.getFileName() }}</td>
-                        <td>{{ attatchment.getName() ~ '.' ~ attatchment.getType() }}</td>
+                        <td>{{ attatchment.getFullPath() ~ '.' ~ attatchment.getType() }}</td>
                         <td>
                             <a href="{{ path('app_admin_attatchment_delete', { 'id': attatchment.getId() }) }}">DELETE</a>
                             <a href="{{ path('app_admin_attatchment_update', { 'id': attatchment.getId() }) }}">UPDATE</a>

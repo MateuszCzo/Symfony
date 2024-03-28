@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Discount Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="example-wrapper">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for discount in discounts %}
+                    <tr>
+                        <td scope="row">{{ discount.getId() }}</td>
+                        <td scope="row">{{ discount.getName() }}</td>
+                        <td scope="row">{{ discount.getValue() }}</td>
+                        <td scope="row">{{ discount.getType() }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_discount_delete', { 'id': discount.getId() }) }}">DELETE</a>
+                            <a href="{{ path('app_admin_discount_update', { 'id': discount.getId() }) }}">UPDATE</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

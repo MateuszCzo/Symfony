@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Discount Controller{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h1>Discount Create</h1>
+
+    {{ form_errors(discountCreateForm) }}
+
+    {{ form_start(discountCreateForm) }}
+        {{ form_widget(discountCreateForm) }}
+
+        <button type="submit" class="btn">Create</button>
+    {{ form_end(discountCreateForm) }}
+{% endblock %}

@@ -75,7 +75,7 @@ class ProductType extends AbstractType
                         'message' => 'Please enter product quantity',
                     ]),
                     new PositiveOrZero([
-                        'message' => 'Please enter product price',
+                        'message' => 'Please enter product quantity',
                     ])
                 ],
             ])

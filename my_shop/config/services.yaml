@@ -33,5 +33,38 @@ services:
         arguments:
             $router: '@router'
 
+        
+    App\Form\Validator\DiscountTypeValidator:
+        arguments:
+            $container: '@service_container'
+
+    App\Form\Validator\CategoriesPercentageDiscountValidator:
+        public: true
+
+    App\Form\Validator\FreeShippingOnCartAboveValueDiscountValidator:
+        public: true
+
+    App\Form\Validator\ProductsPercentageDiscountValidator:
+        public: true
+
+
+    App\Form\Handler\DiscountFormHandler:
+        arguments:
+            $container: '@service_container'
+
+    App\Form\Handler\DiscountFormHandlerTypeParent:
+        arguments:
+            $productRepository: ['@App\Repository\ProductRepository']
+
+    App\Form\Handler\CategoriesPercentageDiscountHandler:
+        public: true
+
+    App\Form\Handler\FreeShippingOnCartAboveValueDiscountHandler:
+        public: true
+
+    App\Form\Handler\ProductsPercentageDiscountHnadler:
+        public: true
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

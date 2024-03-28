@@ -2,18 +2,19 @@
 
 namespace App\Form;
 
-use App\Constants\DeliveryConstants;
-use App\Entity\Delivery;
+use App\Constants\DiscountConstants;
+use App\Entity\Discount;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Positive;
 
-class DeliveryType extends AbstractType
+class DiscountType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -23,46 +24,46 @@ class DeliveryType extends AbstractType
                 'label' => 'Name',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter delivery name',
+                        'message' => 'Please enter discount name'
                     ]),
                     new Length([
                         'max' => 255,
                     ]),
-                ],
+                ]
             ])
-            ->add('description', TextType::class, [
+            ->add('value', NumberType::class, [
                 'required' => true,
-                'label' => 'Description',
+                'label' => 'Value',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter delivery description',
+                        'message' => 'Please enter discount value',
                     ]),
-                    new Length([
-                        'max' => 255,
-                    ]),
+                    new Positive([
+                        'message' => 'Please enter discount value greather than zero'
+                    ])
                 ],
             ])
             ->add('type', ChoiceType::class, [
-                'choices' => DeliveryConstants::DELIVERY_TYPES,
+                'choices' => DiscountConstants::TYPES,
                 'required' => true,
                 'label' => 'Type',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter delivery type',
+                        'message' => 'Please enter discount type',
                     ]),
                 ],
             ])
-            ->add('active', CheckboxType::class, [
-                'label' => 'Active',
-                'required' => false,
-            ])
         ;
+
+        foreach(DiscountConstants::FORM_FIELDS as $formField) {
+            $builder->add(...$formField);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Delivery::class,
+            'data_class' => Discount::class,
         ]);
     }
 }

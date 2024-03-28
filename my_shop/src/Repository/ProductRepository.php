@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -45,4 +46,13 @@ class ProductRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findAllByCategories(ArrayCollection $categories): array
+    {
+        return $this->createQueryBuilder('product')
+            ->andWhere('product.category IN (:categories)')
+            ->setParameter('categories', $categories->toArray())
+            ->getQuery()
+            ->getResult();
+    }
 }
