@@ -52,6 +52,7 @@ class DiscountType extends AbstractType
                         'message' => 'Please enter discount type',
                     ]),
                 ],
+                'attr' => ['class' => 'discount-type-select'],
             ])
         ;
 

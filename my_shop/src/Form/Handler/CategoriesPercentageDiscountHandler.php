@@ -13,24 +13,15 @@ class CategoriesPercentageDiscountHandler extends DiscountFormHandlerTypeParent 
         /**  @var ArrayCollection $categories */
         $categories = $form->get('categories')->getData();
 
-        if (!$categories->count()) {
-            return $discount;
-        }
+        if (!$categories->count()) return $discount;
 
-        $oldProducts = $discount->getProducts();
+        $discount = $this->removeDiscountProducts($discount);
 
-        foreach($oldProducts as $oldProduct) {
-            $discount->removeProduct($oldProduct);
-        }
+        $criteria = [];
 
-        /**  @var ArrayCollection $products */
-        $products = $this->productRepository->findAllByCategories($categories);
+        foreach($categories as $category) $criteria['categoryIds'][] = $category->getId();
 
-        foreach($products as $product) {
-            $discount->addProduct($product);
-        }
-
-        $discount->setCriteria([]);
+        $discount->setCriteria($criteria);
 
         return $discount;
     }

@@ -12,19 +12,11 @@ class ProductsPercentageDiscountHandler extends DiscountFormHandlerTypeParent im
         /**  @var ArrayCollection $products */
         $products = $form->get('products')->getData();
 
-        if (!$products->count()) {
-            return $discount;
-        }
+        if (!$products->count()) return $discount;
         
-        $oldProducts = $discount->getProducts();
+        $discount = $this->removeDiscountProducts($discount);
 
-        foreach($oldProducts as $oldProduct) {
-            $discount->removeProduct($oldProduct);
-        }
-
-        foreach($products as $product) {
-            $discount->addProduct($product);
-        }
+        foreach($products as $product) $discount->addProduct($product);
 
         $discount->setCriteria([]);
 

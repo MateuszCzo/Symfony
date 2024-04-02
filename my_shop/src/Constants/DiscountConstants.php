@@ -29,6 +29,7 @@ class DiscountConstants
                 'multiple' => true,
                 'required' => false,
                 'label' => 'Categories',
+                'attr' => ['class' => 'categories_percentage_discount discount-type'],
             ]
         ],
         'products_percentage_discount' => [
@@ -41,6 +42,7 @@ class DiscountConstants
                 'multiple' => true,
                 'required' => false,
                 'label' => 'Products',
+                'attr' => ['class' => 'products_percentage_discount discount-type'],
             ]
         ],
         'free_shipping_on_cart_above_value_discount' => [
@@ -50,6 +52,7 @@ class DiscountConstants
                 'required' => false,
                 'label' => 'Cart Value',
                 'mapped' => false,
+                'attr' => ['class' => 'free_shipping_on_cart_above_value_discount discount-type'],
             ]
         ]
     ];

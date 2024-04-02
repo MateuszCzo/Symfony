@@ -9,6 +9,8 @@ class FreeShippingOnCartAboveValueDiscountHandler extends DiscountFormHandlerTyp
 {
     public function handle(FormInterface $form, Discount $discount): Discount
     {
+        $discount = $this->removeDiscountProducts($discount);
+
         return $discount->setCriteria([
             'cartValue' => $form->get('cartValue')->getData(),
         ]);
