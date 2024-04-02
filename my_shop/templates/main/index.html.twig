@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Main Controller{% endblock %}
+
+{% block body %}
+<div>
+    <ul>
+        <li><a href="{{ path('app_admin_attatchment_list') }}">Attatchment</a></li>
+        <li><a href="{{ path('app_admin_category_list') }}">Category</a></li>
+        <li><a href="{{ path('app_admin_delivery_list') }}">Delivery</a></li>
+        <li><a href="{{ path('app_admin_discount_list') }}">Discount</a></li>
+        <li><a href="{{ path('app_admin_manufacturer_list') }}">Manufacturer</a></li>
+        <li><a href="{{ path('app_admin_payment_list') }}">Payment</a></li>
+        <li><a href="{{ path('app_admin_product_list') }}">Product</a></li>
+    </ul>
+</div>
+{% endblock %}
