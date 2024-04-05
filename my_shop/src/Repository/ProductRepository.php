@@ -47,11 +47,23 @@ class ProductRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function findAllByCategories(ArrayCollection $categories): array
+    public function findAllByCategories(ArrayCollection|array $categories): array
     {
+        if ($categories instanceof ArrayCollection) $categories = $categories->toArray();
+
         return $this->createQueryBuilder('product')
             ->andWhere('product.category IN (:categories)')
-            ->setParameter('categories', $categories->toArray())
+            ->setParameter('categories', $categories)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getRandomProducts(int $limit): array
+    {
+        return $this->createQueryBuilder('product')
+            ->orderBy('RAND()')
+            ->setMaxResults($limit)
+            ->setParameter('limit', $limit)
             ->getQuery()
             ->getResult();
     }

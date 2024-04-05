@@ -28,7 +28,7 @@ class DeliveryController extends AbstractController
     {
         $deliveries = $this->deliveryRepository->findAll();
 
-        return $this->render('delivery/list.html.twig', [
+        return $this->render('admin/delivery/list.html.twig', [
             'deliveries' => $deliveries,
         ]);
     }
@@ -41,7 +41,7 @@ class DeliveryController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('delivery/create.html.twig', [
+            return $this->render('admin/delivery/create.html.twig', [
                 'deliveryCreateForm' => $form,
             ]);
         }
@@ -68,7 +68,7 @@ class DeliveryController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('delivery/update.html.twig', [
+            return $this->render('admin/delivery/update.html.twig', [
                 'deliveryUpdateForm' => $form,
             ]);
         }

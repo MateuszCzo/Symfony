@@ -34,7 +34,7 @@ class AttatchmentController extends AbstractController
     {
         $attatchments = $this->attatchmentRepository->findAll();
 
-        return $this->render('attatchment/list.html.twig', [
+        return $this->render('admin/attatchment/list.html.twig', [
             'attatchments' => $attatchments,
         ]);
     }
@@ -47,7 +47,7 @@ class AttatchmentController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('attatchment/create.html.twig', [
+            return $this->render('admin/attatchment/create.html.twig', [
                 'attatchmentCreateForm' => $form,
             ]);
         }
@@ -79,7 +79,7 @@ class AttatchmentController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('attatchment/update.html.twig', [
+            return $this->render('admin/attatchment/update.html.twig', [
                 'attatchmentUpdateForm' => $form,
             ]);
         }

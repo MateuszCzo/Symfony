@@ -20,10 +20,9 @@ class LoginController extends AbstractController
 
         $user = $this->getUser();
 
+        // Check if user is logged in and has admin role
         if ($user && in_array('ROLE_ADMIN', $user->getRoles())) {
             return $this->redirectToRoute('app_admin_main');
-        } else {
-            return $this->redirectToRoute('app');
         }
 
         return $this->render('login/login.html.twig', [

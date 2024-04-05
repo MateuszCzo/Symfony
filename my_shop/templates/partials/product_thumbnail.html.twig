@@ -1,0 +1,7 @@
+<div>
+    <a href="{{ path('app_product', { 'id': product.getId() }) }}">
+        <img src="{{ product.getImage().getFullPath() }}">
+        <span>{{ product.getName() }}</span>
+        <span>{{ product.getPrice() }}</span>
+    </a>
+</div>

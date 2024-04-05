@@ -50,7 +50,7 @@ class ProductController extends AbstractController
     {
         $products = $this->productRepository->findAll();
 
-        return $this->render('product/list.html.twig', [
+        return $this->render('admin/product/list.html.twig', [
             'products' => $products,
         ]);
     }
@@ -63,7 +63,7 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('product/create.html.twig', [
+            return $this->render('admin/product/create.html.twig', [
                 'productCreateForm' => $form,
             ]);
         }
@@ -118,7 +118,7 @@ class ProductController extends AbstractController
             /** @var OtherImagesDto $otherImagesDto */
             $otherImagesDto = $this->otherImagesMapper->map($images);
 
-            return $this->render('product/update.html.twig', [
+            return $this->render('admin/product/update.html.twig', [
                 'productUpdateForm' => $form,
                 'otherImagesDto' => $otherImagesDto,
             ]);

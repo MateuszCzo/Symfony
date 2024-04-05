@@ -37,7 +37,7 @@ class DiscountController extends AbstractController
     {
         $discounts = $this->discountRepository->findAll();
 
-        return $this->render('discount/list.html.twig', [
+        return $this->render('admin/discount/list.html.twig', [
             'discounts' => $discounts,
         ]);
     }
@@ -50,7 +50,7 @@ class DiscountController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid() && $this->discountTypeValidator->validate($form))) {
-            return $this->render('discount/create.html.twig', [
+            return $this->render('admin/discount/create.html.twig', [
                 'discountCreateForm' => $form,
             ]);
         }
@@ -75,7 +75,7 @@ class DiscountController extends AbstractController
 
         if (!($form->isSubmitted() && $form->isValid() && 
             $this->discountTypeValidator->validate($form, DiscountConstants::ACTION_UPDATE))) {
-            return $this->render('discount/update.html.twig', [
+            return $this->render('admin/discount/update.html.twig', [
                 'discountUpdateForm' => $form,
             ]);
         }

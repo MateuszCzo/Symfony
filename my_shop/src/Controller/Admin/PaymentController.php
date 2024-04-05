@@ -28,7 +28,7 @@ class PaymentController extends AbstractController
     {
         $payments = $this->paymentRepository->findAll();
 
-        return $this->render('payment/list.html.twig', [
+        return $this->render('admin/payment/list.html.twig', [
             'payments' => $payments,
         ]);
     }
@@ -41,7 +41,7 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('payment/create.html.twig', [
+            return $this->render('admin/payment/create.html.twig', [
                 'paymentCreateForm' => $form,
             ]);
         }
@@ -68,7 +68,7 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('payment/update.html.twig', [
+            return $this->render('admin/payment/update.html.twig', [
                 'paymentUpdateForm' => $form,
             ]);
         }

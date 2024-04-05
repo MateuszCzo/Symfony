@@ -37,7 +37,7 @@ class CategoryController extends AbstractController
         /** @var Category[] $categories */
         $categories = $this->categoryRepository->findAll();
 
-        return $this->render('category/list.html.twig', [
+        return $this->render('admin/category/list.html.twig', [
             'categories' => $categories,
         ]);
     }
@@ -50,7 +50,7 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('category/create.html.twig', [
+            return $this->render('admin/category/create.html.twig', [
                 'categoryCreateForm' => $form,
             ]);
         }
@@ -86,7 +86,7 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('category/update.html.twig', [
+            return $this->render('admin/category/update.html.twig', [
                 'categoryUpdateForm' => $form,
             ]);
         }

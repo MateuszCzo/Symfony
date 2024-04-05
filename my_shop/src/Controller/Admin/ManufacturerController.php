@@ -35,7 +35,7 @@ class ManufacturerController extends AbstractController
     {
         $manufacturers = $this->manufacturerRepository->findAll();
 
-        return $this->render('manufacturer/list.html.twig', [
+        return $this->render('admin/manufacturer/list.html.twig', [
             'manufacturers' => $manufacturers,
         ]);
     }
@@ -49,7 +49,7 @@ class ManufacturerController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('manufacturer/create.html.twig', [
+            return $this->render('admin/manufacturer/create.html.twig', [
                 'manufacturerCreateForm' => $form,
             ]);
         }
@@ -86,7 +86,7 @@ class ManufacturerController extends AbstractController
         $form->handleRequest($request);
 
         if (!($form->isSubmitted() && $form->isValid())) {
-            return $this->render('manufacturer/update.html.twig', [
+            return $this->render('admin/manufacturer/update.html.twig', [
                 'manufacturerUpdateForm' => $form,
             ]);
         }
