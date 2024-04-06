@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>{{ product->getName() }}</h2>
+    <p>{{ product->getDescription() }}</p>
+    <img style="height: 70px" src="{{ product->getImage()->getFullPath() }}">
+    {% for image in product->otherImages() %}
+        <img style="height: 35px" src="{{ image->getFullPath() }}">
+    {% endfor %}
+{% endblock %}

@@ -60,11 +60,10 @@ class ProductRepository extends ServiceEntityRepository
 
     public function getRandomProducts(int $limit): array
     {
-        return $this->createQueryBuilder('product')
-            ->orderBy('RAND()')
-            ->setMaxResults($limit)
-            ->setParameter('limit', $limit)
-            ->getQuery()
-            ->getResult();
+        $products = $this->findAll();
+
+        shuffle($products);
+
+        return array_slice($products, 0, $limit);
     }
 }

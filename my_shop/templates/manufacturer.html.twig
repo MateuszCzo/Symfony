@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>{{ manufacturer.getName() }}</h2>
+    <p>{{ manufacturer.getDescription() }}</p>
+    <img src="{{ manufacturer.getImage().getFullPath() }}">
+
+    {% for product in products %}
+        {% include 'partials/product_thumbnail.html.twig' with {'product': product} %}
+    {% endfor %}
+{% endblock %}

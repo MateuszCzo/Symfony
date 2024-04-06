@@ -25,7 +25,7 @@ class CategoryController extends AbstractController
     {
         $category = $this->categoryRepository->find($id);
 
-        $products = $this->productRepository->findAllByCategories([$category]);
+        $products = $this->productRepository->findBy(['category' => $category, 'active' => true]);
 
         return $this->render('category.html.twig', [
             'category' => $category,

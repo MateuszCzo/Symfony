@@ -3,16 +3,16 @@
 {% block body %}
     <h2>Categories</h2>
     {% for category in categories %}
-        {% include 'category_thumbnail.html.twig' with {'category': category} %}
+        {% include 'partials/category_thumbnail.html.twig' with {'category': category} %}
     {% endfor %}
 
     <h2>Products</h2>
     {% for product in products %}
-        {% include 'product_thumbnail.html.twig' with {'product': product} %}
+        {% include 'partials/product_thumbnail.html.twig' with {'product': product} %}
     {% endfor %}
 
     <h2>Manufacturers</h2>
     {% for manufacturer in manufacturers %}
-        {% include 'manufacturer_thumbnail.html.twig' with {'manufacturer': manufacturer} %}
+        {% include 'partials/manufacturer_thumbnail.html.twig' with {'manufacturer': manufacturer} %}
     {% endfor %}
 {% endblock %}

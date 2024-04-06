@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% for order in orders %}
+        {% include 'partials/order_thumbnail.html.twig' with {'order': order} %}
+    {% endfor %}
+{% endblock %}
